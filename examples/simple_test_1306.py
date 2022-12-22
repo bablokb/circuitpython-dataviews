@@ -36,8 +36,9 @@ view.set_values(
 time.sleep(3)
 
 # now flip background/forground
-view.set_background(DataView.WHITE)
-view.set_color(DataView.BLACK)
+view.invert()
+time.sleep(3)
+view.invert()
 time.sleep(3)
 
 while True:
