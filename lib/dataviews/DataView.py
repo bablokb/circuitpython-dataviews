@@ -77,7 +77,10 @@ class DataView:
   def _text(self,index):
     """ get formatted text by index """
 
-    return self._units[index].format(self._values[index])
+    if self._values[index] is None:
+      return self._units[index]
+    else:
+      return self._units[index].format(self._values[index])
 
   # --- create fields   ------------------------------------------------------
 
@@ -144,8 +147,9 @@ class DataView:
 
   def set_values(self,values):
     self._values = values
-    for i in range(values):
-      self._labels[i].text = self._text(i)
+    if self._group:
+      for i in range(len(values)):
+        self._labels[i].text = self._text(i)
 
   # --- get group   ----------------------------------------------------------
 
