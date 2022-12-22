@@ -132,11 +132,20 @@ class DataView:
 
     if index is None:
       # set color for all labels
+      self._color = color
       for lbl in self._labels:
         lbl.color = color
     else:
       # set color for given label
       self._labels[index].color = color
+
+  # --- invert view   --------------------------------------------------------
+
+  def invert(self):
+    """ invert colors """
+    color_new = self._bg_color
+    self.set_background(self._color)
+    self.set_color(color_new)
 
   # --- set font   -----------------------------------------------------------
 
