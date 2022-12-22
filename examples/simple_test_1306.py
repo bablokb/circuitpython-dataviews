@@ -14,12 +14,21 @@ import time
 from dataviews.SSD1306DataDisplay import SSD1306DataDisplay
 from dataviews.DataView import DataView
 
-dim = (3,2)
-display = SSD1306DataDisplay(dim=dim)
+display = SSD1306DataDisplay(dim=(3,2))
 
 view = display.get_view()
 view.justify(DataView.CENTER)
-view.set_units(["{0:.0f}mV" for i in range(dim[0]*dim[1])])
+view.set_units(
+  ["min:","{0:.1f}mV",
+   "avg:","{0:.1f}mV",
+   "max:","{0:.1f}mV"]
+)
+
+view.set_values(
+  [None,  7.1,
+   None, 22.3,
+   None, 30.8]
+)
 
 display.show()
 
