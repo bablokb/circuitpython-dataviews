@@ -21,7 +21,9 @@ class SSD1306DataDisplay:
 
   # --- constructor   --------------------------------------------------------
 
-  def __init__(self,sda=None,scl=None,width=128,height=64,addr=0x3c,dim=(3,1)):
+  def __init__(self,sda=None,scl=None,
+               width=128,height=64,addr=0x3c,
+               dim=(3,1),**kwargs):
     """ constructor """
 
     if sda is None:
@@ -34,7 +36,7 @@ class SSD1306DataDisplay:
     self._display = adafruit_displayio_ssd1306.SSD1306(display_bus,
                                                        width=width,
                                                        height=height)
-    self._view = DataView(dim,width,height)
+    self._view = DataView(dim,width,height,**kwargs)
 
   # --- return view   --------------------------------------------------------
 
