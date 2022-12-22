@@ -34,32 +34,34 @@ class DataView:
 
   # --- constructor   --------------------------------------------------------
 
-  def __init__(self,dim,width,height):
-    """ constructor: pass dimensions of data-grid and width/height"""
+  def __init__(self,
+               dim,                         # dimension of data (rows,cols)
+               width,                       # width view
+               height,                      # height of view
+               bg_color=BLACK,              # background color
+               color=WHITE,                 # (foreground) color
+               fontname=None,               # font (defaults to terminalio.FONT
+               justify=RIGHT,               # justification of labels
+               formats=None                 # format of labels
+               ):
+    """ constructor """
 
     self._dim      = dim
     self._width    = width
     self._height   = height
-    self._bg_color = DataView.BLACK
-    self._fg_color = DataView.WHITE
-    self._font     = terminalio.FONT
-    self._justify  = DataView.RIGHT
-    self._group    = None
-    self._units    = ['{0}' for i in range(dim[0]*dim[1])]
-    self._values   = [i  for i in range(dim[0]*dim[1])]
+    self._bg_color = None
+    self._color    = color
+    self._font     = (terminalio.FONT if fontname is None else
+                      bitmap_font.load_font(fontname))
+    self._justify  = justify
+    self._formats  = (formats if formats is not None
+                      else ['{0}' for i in range(dim[0]*dim[1])])
+    self._values   = None
     self._labels   = []
 
-  # --- create background   --------------------------------------------------
-
-  def _set_background(self):
-    """ monochrome background """
-
-    palette    = displayio.Palette(1)
-    palette[0] = self._bg_color
-    background = vectorio.Rectangle(pixel_shader=palette,
-                                    width=self._width+1,
-                                    height=self._height, x=0, y=0)
-    self._group.append(background)
+    self._group = displayio.Group()
+    self.set_background(bg_color)
+    self._create_fields()
 
   # --- create label at given location   -------------------------------------
 
@@ -67,9 +69,8 @@ class DataView:
     """ create text at given location """
 
     t = label.Label(self._font,text=text,
-                    color=self._fg_color,anchor_point=anchor)
+                    color=self._color,anchor_point=anchor)
     t.anchored_position = pos
-    self._group.append(t)
     return t
 
   # --- get text for value by index   ----------------------------------------
@@ -77,10 +78,10 @@ class DataView:
   def _text(self,index):
     """ get formatted text by index """
 
-    if self._values[index] is None:
-      return self._units[index]
+    if self._values is None or self._values[index] is None:
+      return self._formats[index]
     else:
-      return self._units[index].format(self._values[index])
+      return self._formats[index].format(self._values[index])
 
   # --- create fields   ------------------------------------------------------
 
@@ -102,59 +103,82 @@ class DataView:
         lbl = self._create_label(self._text(col+row*cols),
                                  (x,y),(x_anchor,y_anchor))
         self._labels.append(lbl)
+        self._group.append(lbl)
         
-  # --- create view   --------------------------------------------------------
+  # --- set background   -----------------------------------------------------
 
-  def create(self):
-    """ create view """
+  def set_background(self,bg_color):
+    """ monochrome background """
 
-    if not self._group:
-      self._group = displayio.Group()
-      self._set_background()
-      self._create_fields()
+    if bg_color == self._bg_color:
+      return
+
+    self._bg_color = bg_color
+    palette        = displayio.Palette(1)
+    palette[0]     = self._bg_color
+    rect           = vectorio.Rectangle(pixel_shader=palette,
+                                        width=self._width+1,
+                                        height=self._height, x=0, y=0)
+    if len(self._group):
+      # background is always the first layer, exchange it
+      self._group[0] = rect
+    else:
+      self._group.append(rect)
 
   # --- set foreground-color   -----------------------------------------------
 
-  def set_fg_color(self,color):
-    """ set foreground color """
-    self._fg_color = color
+  def set_color(self,color,index=None):
+    """ set color """
 
-  # --- set background-color   -----------------------------------------------
-
-  def set_bg_color(self,color):
-    """ set background color """
-    self._bg_color = color
+    if index is None:
+      # set color for all labels
+      for lbl in self._labels:
+        lbl.color = color
+    else:
+      # set color for given label
+      self._labels[index].color = color
 
   # --- set font   -----------------------------------------------------------
 
-  def set_font(self,fontname):
+  def set_font(self,fontname,index=None):
     """ set font """
-    self._font = bitmap_font.load_font(fontname)
+
+    if index is None:
+      # set font for all labels
+      self._font = bitmap_font.load_font(fontname)
+      for lbl in self._labels:
+        lbl.font = self._font
+    else:
+      # set font for given label
+      font = bitmap_font.load_font(fontname)
+      self._labels[index].font = font
 
   # --- set justification of values    ---------------------------------------
 
-  def justify(self,just):
+  def justify(self,justify,index=None):
     """ set justification within cell """
-    self._justify = just
 
-  # --- set units   ----------------------------------------------------------
+    if index is None:
+      # justify all labels
+      self._justify = justify
 
-  def set_units(self,units):
-    """ set units. One format string for every data-item """
-    self._units = units
+  # --- set formats   --------------------------------------------------------
+
+  def set_formats(self,formats):
+    """ set formats. One format string for every data-item """
+    self._formats = formats
 
   # --- set values    --------------------------------------------------------
 
   def set_values(self,values):
+    """ set values """
     self._values = values
-    if self._group:
-      for i in range(len(values)):
-        self._labels[i].text = self._text(i)
+    for i in range(len(values)):
+      self._labels[i].text = self._text(i)
 
   # --- get group   ----------------------------------------------------------
 
   def get_group(self):
-    """ return group (create if necessary) """
+    """ return group """
 
-    self.create()
     return self._group
