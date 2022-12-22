@@ -1,0 +1,11 @@
+work
+*.pyc
+*.mpy
+TODO
+doc.local
+test
+lib/adafruit*
+*secrets.py
+*configuration.py
+boot_out.txt
+*.stl
