@@ -11,9 +11,11 @@
 # ----------------------------------------------------------------------------
 
 import time
+import displayio
 from dataviews.SSD1306DataDisplay import SSD1306DataDisplay
 from dataviews.DataView import DataView
 
+displayio.release_displays()
 display = SSD1306DataDisplay(
   dim=(3,2),
   justify=DataView.CENTER,
