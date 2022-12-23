@@ -43,6 +43,6 @@ class SSD1306DataDisplay(adafruit_displayio_ssd1306.SSD1306):
 
   # --- show   ---------------------------------------------------------------
 
-  def show(self):
+  def show_view(self):
     """ show view inside the display """
-    super().show(self._view)
+    self.show(self._view)
