@@ -59,18 +59,32 @@ class DataView:
     self._values   = None
     self._labels   = []
 
+    # some constant values that depend on dim and width/height
+    self._rows     = self._dim[0]
+    self._cols     = self._dim[1]
+    self._w_cell   = self._width/self._cols
+    self._h_cell   = self._height/self._rows
+    self._y_anchor = 0.5
+
+    # create UI-elements
     self._group = displayio.Group()
     self.set_background(bg_color)
     self._create_fields()
 
   # --- create label at given location   -------------------------------------
 
-  def _create_label(self,text,pos,anchor):
+  def _create_label(self,text,row,col,justify):
     """ create text at given location """
 
+    x_off    = justify*self._w_cell/2
+    x_anchor = 0.5*justify
+    x        = x_off + col*self._w_cell
+    y        = (2*row+1)*self._h_cell/2
+
     t = label.Label(self._font,text=text,
-                    color=self._color,anchor_point=anchor)
-    t.anchored_position = pos
+                    color=self._color,
+                    anchor_point=(x_anchor,self._y_anchor),
+                    anchored_position=(x,y))
     return t
 
   # --- get text for value by index   ----------------------------------------
@@ -88,20 +102,10 @@ class DataView:
   def _create_fields(self):
     """ create fields """
 
-    rows     = self._dim[0]
-    cols     = self._dim[1]
-    w_cell   = self._width/cols
-    h_cell   = self._height/rows
-    x_off    = self._justify*w_cell/2
-    x_anchor = 0.5*self._justify
-    y_anchor = 0.5
-
-    for row in range(rows):
-      y = (2*row+1)*h_cell/2                 # fixed, vertical center of label
-      for col in range(cols):
-        x = x_off + col*w_cell
-        lbl = self._create_label(self._text(col+row*cols),
-                                 (x,y),(x_anchor,y_anchor))
+    for row in range(self._rows):
+      for col in range(self._cols):
+        lbl = self._create_label(self._text(col+row*self._cols),
+                                 row,col,self._justify)
         self._labels.append(lbl)
         self._group.append(lbl)
         
