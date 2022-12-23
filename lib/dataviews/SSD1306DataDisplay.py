@@ -17,7 +17,7 @@ import adafruit_displayio_ssd1306
 
 from dataviews.DataView import DataView
 
-class SSD1306DataDisplay:
+class SSD1306DataDisplay(adafruit_displayio_ssd1306.SSD1306):
 
   # --- constructor   --------------------------------------------------------
 
@@ -30,12 +30,9 @@ class SSD1306DataDisplay:
       sda = board.SDA
     if scl is None:
       scl = board.SCL
-    displayio.release_displays()
     i2c = busio.I2C(sda=sda,scl=scl,frequency=400000)
     display_bus = displayio.I2CDisplay(i2c, device_address=addr)
-    self._display = adafruit_displayio_ssd1306.SSD1306(display_bus,
-                                                       width=width,
-                                                       height=height)
+    super().__init__(display_bus,width=width,height=height)
     self._view = DataView(dim,width,height,**kwargs)
 
   # --- return view   --------------------------------------------------------
@@ -44,14 +41,8 @@ class SSD1306DataDisplay:
     """ return view """
     return self._view
 
-  # --- return display   -----------------------------------------------------
-
-  def get_display(self):
-    """ return display """
-    return self._display
-
   # --- show   ---------------------------------------------------------------
 
   def show(self):
     """ show view inside the display """
-    self._display.show(self._view.get_group())
+    super().show(self._view.get_group())
