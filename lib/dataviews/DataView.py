@@ -63,7 +63,6 @@ class DataView(displayio.Group):
     self._formats  = (formats if formats is not None
                       else ['{0}' for i in range(dim[0]*dim[1])])
     self._values   = None
-    self._labels   = []
 
     # some constant values that depend on dim and width/height
     self._rows     = self._dim[0]
@@ -73,9 +72,8 @@ class DataView(displayio.Group):
     self._y_anchor = 0.5
 
     # create UI-elements
-    self._group = displayio.Group()
     self.set_background(bg_color)
-    self._create_fields()
+    self._create_labels()
 
   # --- create label at given location   -------------------------------------
 
@@ -103,17 +101,20 @@ class DataView(displayio.Group):
     else:
       return self._formats[index].format(self._values[index])
 
-  # --- create fields   ------------------------------------------------------
+  # --- create labels   ------------------------------------------------------
 
-  def _create_fields(self):
+  def _create_labels(self):
     """ create fields """
 
+    self._labels = displayio.Group()
     for row in range(self._rows):
       for col in range(self._cols):
         lbl = self._create_label(row,col,self._justify)
         self._labels.append(lbl)
-        self.append(lbl)
-        
+
+    # append labels as sub-group to ourselves
+    self.append(self._labels)
+
   # --- set background   -----------------------------------------------------
 
   def set_background(self,bg_color):
@@ -176,8 +177,6 @@ class DataView(displayio.Group):
   def justify(self,justify,index=None):
     """ set justification within cell """
 
-    # the code assumes that group[0] is the background and
-    # group[1...rows*cols] are the labels
     if index is None:
       # justify all labels
       self._justify = justify
@@ -185,11 +184,9 @@ class DataView(displayio.Group):
         for col in range(self._cols):
           lbl = self._create_label(row,col,self._justify)
           self._labels[col+row*self._cols] = lbl
-          self[1+col+row*self._cols] = lbl
     else:
       row,col = divmod(index,self._cols)
-      self._labels[index]  = self._create_label(row,col,justify)
-      self[1+index] = self._labels[index]
+      self._labels[index] = self._create_label(row,col,justify)
 
     # remove unused labels
     gc.collect()
