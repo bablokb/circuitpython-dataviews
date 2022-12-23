@@ -35,10 +35,18 @@ view.set_values(
 )
 time.sleep(3)
 
-# now flip background/forground
+# flip background/forground
 view.invert()
 time.sleep(3)
 view.invert()
+time.sleep(3)
+
+# realign labels
+view.justify(DataView.RIGHT)
+time.sleep(3)
+for index in [0,2,4]:
+  view.justify(DataView.LEFT,index)
+  time.sleep(1)
 time.sleep(3)
 
 while True:
