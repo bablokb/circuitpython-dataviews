@@ -73,7 +73,7 @@ class DataView:
 
   # --- create label at given location   -------------------------------------
 
-  def _create_label(self,text,row,col,justify):
+  def _create_label(self,row,col,justify):
     """ create text at given location """
 
     x_off    = justify*self._w_cell/2
@@ -81,7 +81,7 @@ class DataView:
     x        = x_off + col*self._w_cell
     y        = (2*row+1)*self._h_cell/2
 
-    t = label.Label(self._font,text=text,
+    t = label.Label(self._font,text=self._text(col+row*self._cols),
                     color=self._color,
                     anchor_point=(x_anchor,self._y_anchor),
                     anchored_position=(x,y))
@@ -104,8 +104,7 @@ class DataView:
 
     for row in range(self._rows):
       for col in range(self._cols):
-        lbl = self._create_label(self._text(col+row*self._cols),
-                                 row,col,self._justify)
+        lbl = self._create_label(row,col,self._justify)
         self._labels.append(lbl)
         self._group.append(lbl)
         
