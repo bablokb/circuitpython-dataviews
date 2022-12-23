@@ -15,7 +15,10 @@ import displayio
 from dataviews.SSD1306DataDisplay import SSD1306DataDisplay
 from dataviews.DataView import DataView
 
+# always release displays!
 displayio.release_displays()
+
+# create new display with integrated view
 display = SSD1306DataDisplay(
   dim=(3,2),
   justify=DataView.CENTER,
@@ -25,7 +28,7 @@ display = SSD1306DataDisplay(
 )
 
 # show without values
-display.show()
+display.show_view()
 time.sleep(3)
 
 # now set values
@@ -43,13 +46,14 @@ time.sleep(3)
 view.invert()
 time.sleep(3)
 
-# realign labels
+# realign all fields
 view.justify(DataView.RIGHT)
 time.sleep(3)
+
+# realign only fields in first column
 for index in [0,2,4]:
   view.justify(DataView.LEFT,index)
   time.sleep(1)
-time.sleep(3)
 
 while True:
   time.sleep(10)
