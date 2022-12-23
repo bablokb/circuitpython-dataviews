@@ -10,6 +10,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import gc
 import displayio
 import vectorio
 import terminalio
@@ -170,9 +171,23 @@ class DataView:
   def justify(self,justify,index=None):
     """ set justification within cell """
 
+    # the code assumes that group[0] is the background and
+    # group[1...rows*cols] are the labels
     if index is None:
       # justify all labels
       self._justify = justify
+      for row in range(self._rows):
+        for col in range(self._cols):
+          lbl = self._create_label(row,col,self._justify)
+          self._labels[col+row*self._cols] = lbl
+          self._group[1+col+row*self._cols] = lbl
+    else:
+      row,col = divmod(index,self._cols)
+      self._labels[index]  = self._create_label(row,col,justify)
+      self._group[1+index] = self._labels[index]
+
+    # remove unused labels
+    gc.collect()
 
   # --- set formats   --------------------------------------------------------
 
