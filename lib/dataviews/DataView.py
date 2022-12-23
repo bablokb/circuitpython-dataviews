@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------
 # DataView: base class for data-views.
 #
-# A DataView displays data in a (row,col)-grid.
+# A DataView displays data in a (row,col)-grid. Technically, it is a
+# displayio.Group, so the view can be added to the view-hierarchy.
 #
 # Author: Bernhard Bablok
 # License: GPL3
@@ -19,7 +20,7 @@ from adafruit_bitmap_font import bitmap_font
 
 # --- base class for all data-views   ----------------------------------------
 
-class DataView:
+class DataView(displayio.Group):
 
   # some basic colors
   WHITE = 0xFFFFFF
@@ -43,9 +44,13 @@ class DataView:
                color=WHITE,                 # (foreground) color
                fontname=None,               # font (defaults to terminalio.FONT
                justify=RIGHT,               # justification of labels
-               formats=None                 # format of labels
+               formats=None,                # format of labels
+               x=0,                         # for displayio.Group
+               y=0                          # for displayio.Group
                ):
     """ constructor """
+
+    super().__init__(x=x,y=y)
 
     self._dim      = dim
     self._width    = width
@@ -107,7 +112,7 @@ class DataView:
       for col in range(self._cols):
         lbl = self._create_label(row,col,self._justify)
         self._labels.append(lbl)
-        self._group.append(lbl)
+        self.append(lbl)
         
   # --- set background   -----------------------------------------------------
 
@@ -123,11 +128,11 @@ class DataView:
     rect           = vectorio.Rectangle(pixel_shader=palette,
                                         width=self._width+1,
                                         height=self._height, x=0, y=0)
-    if len(self._group):
+    if len(self):
       # background is always the first layer, exchange it
-      self._group[0] = rect
+      self[0] = rect
     else:
-      self._group.append(rect)
+      self.append(rect)
 
   # --- set foreground-color   -----------------------------------------------
 
@@ -180,11 +185,11 @@ class DataView:
         for col in range(self._cols):
           lbl = self._create_label(row,col,self._justify)
           self._labels[col+row*self._cols] = lbl
-          self._group[1+col+row*self._cols] = lbl
+          self[1+col+row*self._cols] = lbl
     else:
       row,col = divmod(index,self._cols)
       self._labels[index]  = self._create_label(row,col,justify)
-      self._group[1+index] = self._labels[index]
+      self[1+index] = self._labels[index]
 
     # remove unused labels
     gc.collect()
@@ -202,10 +207,3 @@ class DataView:
     self._values = values
     for i in range(len(values)):
       self._labels[i].text = self._text(i)
-
-  # --- get group   ----------------------------------------------------------
-
-  def get_group(self):
-    """ return group """
-
-    return self._group
