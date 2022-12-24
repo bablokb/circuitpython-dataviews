@@ -4,6 +4,7 @@ Fonts
 This directory contain a number of font-files in BDF-format:
 
   - DejaVuSansMono-Bold-18-subset.bdf
+  - DejaVuSansMono-Bold-24-subset.bdf
   - DejaVuSansMono-Bold-32-subset.bdf
   - DejaVuSansMono-Bold-52-subset.bdf
 
