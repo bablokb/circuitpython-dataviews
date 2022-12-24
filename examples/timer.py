@@ -10,36 +10,29 @@
 
 import time
 import displayio
-from dataviews.SSD1306DataDisplay import SSD1306DataDisplay
+from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
-# always release displays!
-displayio.release_displays()
+# always release displays (unless you use a builtin-display)
+if not hasattr(board,'DISPLAY'):
+  displayio.release_displays()
 
-# create new display with integrated view
-display = SSD1306DataDisplay(
+# create display (choose your type!)
+if hasattr(board,'DISPLAY'):
+  display = board.DISPLAY
+else:
+  display = DisplayFactory.ssd1306()
+
+# create view
+view = DataView(
   dim=(1,1),
+  width=display.width,height=display.height,
   justify=DataView.CENTER,
   bg_color=DataView.WHITE,
   color=DataView.BLACK,
   fontname="fonts/DejaVuSansMono-Bold-32-subset.bdf",
-  formats=["{0}"]
+  formats=["{0}"],
 )
-view = display.get_view()
-
-# for other displays, e.g. builtin displays use
-#import board
-#display = board.DISPLAY
-#view = DataView(
-#  dim=(1,1),
-#  width=display.width,
-#  height=display.height,
-#  justify=DataView.CENTER,
-#  bg_color=DataView.WHITE,
-#  color=DataView.BLACK,
-#  fontname="fonts/DejaVuSansMono-Bold-32-subset.bdf",
-#  formats=["{0}"]
-#)
 
 # --- format timer   ---------------------------------------------------------
 
@@ -59,7 +52,7 @@ values   = ["00:00"]
 
 start = time.monotonic()
 view.set_values(values)
-display.show(view)    # SSD1306DataDisplay also implements: display.show_view()
+display.show(view)
 
 while True:
   overhead = time.monotonic() - start
