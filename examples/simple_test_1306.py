@@ -11,15 +11,23 @@
 # ----------------------------------------------------------------------------
 
 import time
+import board
 import displayio
-from dataviews.SSD1306DataDisplay import SSD1306DataDisplay
+from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
-# always release displays!
-displayio.release_displays()
+# always release displays (unless you use a builtin-display)
+if not hasattr(board,'DISPLAY'):
+  displayio.release_displays()
 
-# create new display with integrated view
-display = SSD1306DataDisplay(
+# create display (choose your type!)
+if hasattr(board,'DISPLAY'):
+  display = board.DISPLAY
+else:
+  display = DisplayFactory.ssd1306()
+
+# create view
+view = DataView(
   dim=(3,2),
   justify=DataView.CENTER,
   formats=["min:","{0:.1f}mV",
@@ -28,11 +36,10 @@ display = SSD1306DataDisplay(
 )
 
 # show without values
-display.show_view()
+display.show(view)
 time.sleep(3)
 
 # now set values
-view = display.get_view()
 view.set_values(
   [None,  7.1,
    None, 22.3,
