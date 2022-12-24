@@ -29,6 +29,7 @@ else:
 # create view
 view = DataView(
   dim=(3,2),
+  width=display.width,height=display.height,
   justify=DataView.CENTER,
   formats=["min:","{0:.1f}mV",
            "avg:","{0:.1f}mV",
