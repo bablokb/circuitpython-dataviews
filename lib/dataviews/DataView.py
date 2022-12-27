@@ -16,6 +16,7 @@ import displayio
 import vectorio
 import terminalio
 from adafruit_display_text import label
+from adafruit_display_shapes.line import Line
 from adafruit_bitmap_font import bitmap_font
 
 # --- base class for all data-views   ----------------------------------------
@@ -42,6 +43,9 @@ class DataView(displayio.Group):
                height,                      # height of view
                bg_color=BLACK,              # background color
                color=WHITE,                 # (foreground) color
+               border=0,                    # border-size in pixels
+               divider=0,                   # divider-size in pixels
+               padding=1,                   # padding next to border/divider
                fontname=None,               # font (defaults to terminalio.FONT
                justify=RIGHT,               # justification of labels
                formats=None,                # format of labels
@@ -57,6 +61,9 @@ class DataView(displayio.Group):
     self._height   = height
     self._bg_color = None
     self._color    = color
+    self._border   = border
+    self._divider  = divider
+    self._padding  = padding
     self._font     = (terminalio.FONT if fontname is None else
                       bitmap_font.load_font(fontname))
     self._justify  = justify
@@ -73,14 +80,65 @@ class DataView(displayio.Group):
 
     # create UI-elements
     self.set_background(bg_color)
+    self._create_lines()
     self._create_labels()
+
+  # --- create border and dividers   -----------------------------------------
+
+  def _create_lines(self):
+    """ create border and dividers """
+
+    self._lines = displayio.Group()
+    self.append(self._lines)
+    if self._border and self._divider:
+      # all lines
+      rows = range(0,self._rows+1)
+      cols = range(0,self._cols+1)
+    elif self._border and not self._divider:
+      # only outer lines
+      rows = [0,self._rows+1]
+      cols = [0,self._cols+1]
+    elif self._divider:
+      # only inner lines
+      rows = range(1,self._rows)
+      cols = range(1,self._cols)
+    else:
+      # no lines at all
+      return
+
+    # draw horizontal lines
+    x0 = 0
+    x1 = self._width-1
+    ydelta = float(self._height/self._rows)
+    for row in rows:
+      y = min(int(row*ydelta),self._height-1)
+      line = Line(x0,y,x1,y,color=self._color)
+      self._lines.append(line)
+
+    # draw vertical lines
+    y0 = 0
+    y1 = self._height-1
+    xdelta = float(self._width/self._cols)
+    for col in cols:
+      x = min(int(col*xdelta),self._width-1)
+      line = Line(x,y0,x,y1,color=self._color)
+      self._lines.append(line)
 
   # --- create label at given location   -------------------------------------
 
   def _create_label(self,row,col,justify):
     """ create text at given location """
 
-    x_off    = justify*self._w_cell/2
+    x_off = justify*self._w_cell/2
+    if justify == DataView.LEFT and col == 0:
+      x_off += self._border + self._padding
+    elif justify == DataView.LEFT:
+      x_off += self._divider + self._padding
+    if justify == DataView.RIGHT and col == self._cols-1:
+      x_off -= self._border + self._padding
+    elif justify == DataView.RIGHT:
+      x_off -= self._divider + self._padding
+
     x_anchor = 0.5*justify
     x        = x_off + col*self._w_cell
     y        = (2*row+1)*self._h_cell/2
@@ -141,10 +199,12 @@ class DataView(displayio.Group):
     """ set color """
 
     if index is None:
-      # set color for all labels
+      # set color for all labels and lines
       self._color = color
       for lbl in self._labels:
         lbl.color = color
+      for line in self._lines:
+        line.color = color
     else:
       # set color for given label
       self._labels[index].color = color
