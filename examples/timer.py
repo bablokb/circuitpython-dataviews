@@ -8,6 +8,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import board
 import time
 import displayio
 from dataviews.DisplayFactory import DisplayFactory
