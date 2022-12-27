@@ -34,6 +34,9 @@ view = DataView(
   formats=["min:","{0:.1f}mV",
            "avg:","{0:.1f}mV",
            "max:","{0:.1f}mV"],
+  border=1,
+  divider=1,
+  padding=1,
 )
 
 # show without values
