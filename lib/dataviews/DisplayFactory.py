@@ -54,3 +54,20 @@ class DisplayFactory:
                              reset=pin_rst)
     return ST7789(bus,width=width,height=height,rotation=rotation,
                   rowstart=rowstart,colstart=colstart)
+
+  # --- create ST7735-based SPI-display   ------------------------------------
+
+  @staticmethod
+  def st7735(pin_dc,pin_cs,spi=None,pin_rst=None,
+             height=128,width=160,rotation=90,bgr=True):
+    """ factory-method for ST7735-based SPI-displays """
+
+    from adafruit_st7735r import ST7735R       # SPI-TFT  display
+
+    if spi is None:
+      spi = board.SPI()
+
+    bus = displayio.FourWire(spi,command=pin_dc,chip_select=pin_cs,
+                             reset=pin_rst)
+    return ST7735R(bus,width=width,height=height,
+                   rotation=rotation,bgr=bgr)
