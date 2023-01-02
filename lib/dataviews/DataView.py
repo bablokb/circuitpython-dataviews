@@ -70,6 +70,7 @@ class DataView(displayio.Group):
     self._formats  = (formats if formats is not None
                       else ['{0}' for i in range(dim[0]*dim[1])])
     self._values   = None
+    self._color_r  = {}
 
     # some constant values that depend on dim and width/height
     self._rows     = self._dim[0]
@@ -159,6 +160,22 @@ class DataView(displayio.Group):
     else:
       return self._formats[index].format(self._values[index])
 
+  # --- set color from color_range and value   -------------------------------
+
+  def _value2color(self,index):
+    """ get color for given value """
+
+    if not index in self._color_r:
+      # no range, so just return the current color
+      return self._labels[index].color
+
+    # search for given color
+    for color,val in self._color_r[index]:
+      if val is None:
+        return color
+      elif self._values[index] <= val:
+        return color
+
   # --- create labels   ------------------------------------------------------
 
   def _create_labels(self):
@@ -195,19 +212,31 @@ class DataView(displayio.Group):
 
   # --- set foreground-color   -----------------------------------------------
 
-  def set_color(self,color,index=None):
-    """ set color """
+  def set_color(self,color=None,index=None,color_range=None):
+    """ set color.
+    If color_range = [(color1,value1),...] is supplied, the color argument
+    is ignored and the color depends on the value. Note that the
+    tuples within range have to be ordered by value. The last value can
+    be None.
+    """
 
     if index is None:
+      if color is None:
+        return
       # set color for all labels and lines
       self._color = color
       for lbl in self._labels:
         lbl.color = color
       for line in self._lines:
         line.color = color
-    else:
+    elif color_range is None:
+      if color is None:
+        return
       # set color for given label
       self._labels[index].color = color
+    else:
+      self._color_r[index] = color_range
+      self._labels[index].color = self._value2color(index)
 
   # --- invert view   --------------------------------------------------------
 
@@ -264,3 +293,4 @@ class DataView(displayio.Group):
     self._values = values
     for i in range(len(values)):
       self._labels[i].text = self._text(i)
+      self._labels[i].color = self._value2color(i)
