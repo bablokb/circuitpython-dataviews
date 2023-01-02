@@ -23,12 +23,28 @@ from adafruit_bitmap_font import bitmap_font
 
 class DataView(displayio.Group):
 
-  # some basic colors
-  WHITE = 0xFFFFFF
-  BLACK = 0x000000
-  RED   = 0xFF0000
-  GREEN = 0x00FF00
-  BLUE  = 0x0000FF
+  # some basic colors (see: https://en.wikipedia.org/wiki/Web_colors)
+  WHITE   = FFFFFF
+  BLACK   = 000000
+
+  RED     = FF0000
+  LIME    = 00FF00
+  BLUE    = 0000FF
+
+  YELLOW  = FFFF00
+  FUCHSIA = FF00FF
+  AQUA    = 00FFFF
+
+  MAROON  = 800000
+  GREEN   = 008000
+  NAVY    = 000080
+
+  GRAY    = 808080
+  OLIVE   = 808000
+  TEAL    = 008080
+  PURPLE  = 800080
+
+  SILVER  = C0C0C0
 
   # justification
   LEFT   = 0
