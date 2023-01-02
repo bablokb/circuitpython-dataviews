@@ -74,5 +74,16 @@ for index in [0,2,4]:
   view.set_color(DataView.BLUE,index)
   time.sleep(1)
 
+# set dynamic colors
+for index in [1,3,5]:
+  view.set_color(index=index,
+                 color_range=[(DataView.BLUE,15),
+                              (DataView.WHITE,24),(DataView.RED,None)])
+time.sleep(3)
+
 while True:
-  time.sleep(10)
+  for i in range(30):
+    view.set_values([None,i,
+                     None,2.0*i/3.0,
+                     None,30-i])
+    time.sleep(1)
