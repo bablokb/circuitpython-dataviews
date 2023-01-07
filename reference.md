@@ -1,6 +1,29 @@
 Reference
 =========
 
+Class Justify
+-------------
+
+Constants for justification of fields:
+  * `Justify.LEFT`
+  * `Justify.CENTER`
+  * `Justify.RIGHT`
+
+Import:
+
+    from dataviews.Base import Justify
+
+
+Class Color
+-----------
+
+Color constants for sixteen HTML 4.01 basic web colors
+(see: <https://en.wikipedia.org/wiki/Web_colors>).
+
+Import:
+
+    from dataviews.Base import Color
+
 
 Class DataView
 --------------
@@ -24,11 +47,6 @@ for the DataView.
 Some attributes can only be set using the constructor, other attributes
 can be changed dynamically.
 
-  - Constants:
-    * `LEFT, CENTER, RIGHT`: justification of fields
-    * `WHITE, BLACK, RED, GREEN, BLUE`: some basic colors
-
-
   - Fixed attributes
     * `dim = (rows,cols)`: dimension
     * `width`: width of the view in pixels
@@ -40,18 +58,22 @@ can be changed dynamically.
     * `y=0`    : y-origin within parent group
 
   - Variable attributes (see methods below):
-    * `bg_color = BLACK`: background color
-    * `color = WHITE`: color of lines and values
+    * `bg_color = Color.BLACK`: background color
+    * `color = Color.WHITE`: color of lines and values
     * `fontname = None`: name of the font to load. If unset, uses 
        `terminalio.Font`, a very small font
-    * `justify=RIGHT`: justification of all fields
+    * `justify=Justify.RIGHT`: justification of all fields
     * `formats=None`: formats of fields. Must be a list with rows x cols elements.
 
   - Methods:
     * `set_background(self,bg_color)`: set background color.
-    * `set_color(self,color,index=None)`: set global foreground color or color
-      of the field with the given index. The index is mapped to fields
-      in row-column order.
+    * `set_color(self,color=None,index=None,color_range=None)`:  
+       set global foreground color or color of the field with the given index.
+       The index is mapped to fields in row-column order.  
+       You can also supply a color-range as a list `[(color,value),...]`,e.g.
+       `[(Color.BLUE,0),(Color.GREEN,20),(Color.RED,None)]`. With
+       this example values below zero will be in blue, below 20 in green and all
+       values above will be in red color.
     * `invert(self)`: flip forground and background colors.
     * `set_font(self,fontname,index=None)`: set global font or font of the
       field with the given index.
