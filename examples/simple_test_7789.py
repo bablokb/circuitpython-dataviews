@@ -14,6 +14,8 @@ import board
 import time
 import busio
 import displayio
+
+from dataviews.Base import Color, Justify
 from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
@@ -35,8 +37,8 @@ else:
 view = DataView(
   dim=(3,2),
   width=display.width,height=display.height,
-  justify=DataView.CENTER,
-  color=DataView.GREEN,
+  justify=Justify.CENTER,
+  color=Color.GREEN,
   fontname="fonts/DejaVuSansMono-Bold-24-subset.bdf",
   formats=["min:","{0:.1f}mV",
            "avg:","{0:.1f}mV",
@@ -65,20 +67,20 @@ view.invert()
 time.sleep(3)
 
 # realign all fields
-view.justify(DataView.RIGHT)
+view.justify(Justify.RIGHT)
 time.sleep(3)
 
 # realign only fields in first column
 for index in [0,2,4]:
-  view.justify(DataView.LEFT,index)
-  view.set_color(DataView.BLUE,index)
+  view.justify(Justify.LEFT,index)
+  view.set_color(Color.BLUE,index)
   time.sleep(1)
 
 # set dynamic colors
 for index in [1,3,5]:
   view.set_color(index=index,
-                 color_range=[(DataView.BLUE,15),
-                              (DataView.WHITE,24),(DataView.RED,None)])
+                 color_range=[(Color.BLUE,15),
+                              (Color.WHITE,24),(Color.RED,None)])
 time.sleep(3)
 
 while True:

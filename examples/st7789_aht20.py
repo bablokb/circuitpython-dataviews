@@ -19,6 +19,7 @@ import displayio
 
 import adafruit_ahtx0          # AHT20
 
+from dataviews.Base import Color, Justify
 from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
@@ -47,7 +48,7 @@ sensor = adafruit_ahtx0.AHTx0(i2c)
 view = DataView(
   dim=(2,1),
   width=display.width,height=display.height,
-  justify=DataView.RIGHT,
+  justify=Justify.RIGHT,
   fontname="fonts/DejaVuSansMono-Bold-32-subset.bdf",
   formats=["{0:.1f}°C",
            "{0:.0f}%"],

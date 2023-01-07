@@ -11,6 +11,8 @@
 import board
 import time
 import displayio
+
+from dataviews.Base import Color, Justify
 from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
@@ -28,9 +30,9 @@ else:
 view = DataView(
   dim=(1,1),
   width=display.width,height=display.height,
-  justify=DataView.CENTER,
-  bg_color=DataView.WHITE,
-  color=DataView.BLACK,
+  justify=Justify.CENTER,
+  bg_color=Color.WHITE,
+  color=Color.BLACK,
   fontname="fonts/DejaVuSansMono-Bold-32-subset.bdf",
   formats=["{0}"],
 )

@@ -13,6 +13,8 @@
 import time
 import board
 import displayio
+
+from dataviews.Base import Justify
 from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView import DataView
 
@@ -30,7 +32,7 @@ else:
 view = DataView(
   dim=(3,2),
   width=display.width,height=display.height,
-  justify=DataView.CENTER,
+  justify=Justify.CENTER,
   formats=["min:","{0:.1f}mV",
            "avg:","{0:.1f}mV",
            "max:","{0:.1f}mV"],
@@ -58,12 +60,12 @@ view.invert()
 time.sleep(3)
 
 # realign all fields
-view.justify(DataView.RIGHT)
+view.justify(Justify.RIGHT)
 time.sleep(3)
 
 # realign only fields in first column
 for index in [0,2,4]:
-  view.justify(DataView.LEFT,index)
+  view.justify(Justify.LEFT,index)
   time.sleep(1)
 
 while True:
