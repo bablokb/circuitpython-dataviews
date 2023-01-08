@@ -64,8 +64,8 @@ class DataView(BaseGroup):
     # some constant values that depend on dim and width/height
     self._rows     = self._dim[0]
     self._cols     = self._dim[1]
-    self._w_cell   = self._width/self._cols
-    self._h_cell   = self._height/self._rows
+    self._w_cell   = self.width/self._cols
+    self._h_cell   = self.height/self._rows
     self._y_anchor = 0.5
 
     # create UI-elements
@@ -98,19 +98,19 @@ class DataView(BaseGroup):
 
     # draw horizontal lines
     x0 = 0
-    x1 = self._width-1
-    ydelta = float(self._height/self._rows)
+    x1 = self.width-1
+    ydelta = float(self.height/self._rows)
     for row in rows:
-      y = min(int(row*ydelta),self._height-1)
+      y = min(int(row*ydelta),self.height-1)
       line = Line(x0,y,x1,y,color=self._color)
       self._lines.append(line)
 
     # draw vertical lines
     y0 = 0
-    y1 = self._height-1
-    xdelta = float(self._width/self._cols)
+    y1 = self.height-1
+    xdelta = float(self.width/self._cols)
     for col in cols:
-      x = min(int(col*xdelta),self._width-1)
+      x = min(int(col*xdelta),self.width-1)
       line = Line(x,y0,x,y1,color=self._color)
       self._lines.append(line)
 

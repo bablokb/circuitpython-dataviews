@@ -60,8 +60,8 @@ class BaseGroup(displayio.Group):
 
     super().__init__(x=x,y=y)
 
-    self._width    = width
-    self._height   = height
+    self.width     = width
+    self.height    = height
     self._bg_color = None
     self._color    = color
     self._border   = border
@@ -79,8 +79,8 @@ class BaseGroup(displayio.Group):
     palette        = displayio.Palette(1)
     palette[0]     = self._bg_color
     rect           = vectorio.Rectangle(pixel_shader=palette,
-                                        width=self._width+1,
-                                        height=self._height, x=0, y=0)
+                                        width=self.width+1,
+                                        height=self.height, x=0, y=0)
     if len(self):
       # background is always the first layer, exchange it
       self[0] = rect
