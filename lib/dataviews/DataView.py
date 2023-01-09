@@ -80,11 +80,11 @@ class DataView(BaseGroup):
 
     self._lines = displayio.Group()
     self.append(self._lines)
-    if self._border and self._divider:
+    if self.border and self._divider:
       # all lines
       rows = range(0,self._rows+1)
       cols = range(0,self._cols+1)
-    elif self._border and not self._divider:
+    elif self.border and not self._divider:
       # only outer lines
       rows = [0,self._rows+1]
       cols = [0,self._cols+1]
@@ -102,7 +102,7 @@ class DataView(BaseGroup):
     ydelta = float(self.height/self._rows)
     for row in rows:
       y = min(int(row*ydelta),self.height-1)
-      line = Line(x0,y,x1,y,color=self._color)
+      line = Line(x0,y,x1,y,color=self.color)
       self._lines.append(line)
 
     # draw vertical lines
@@ -111,7 +111,7 @@ class DataView(BaseGroup):
     xdelta = float(self.width/self._cols)
     for col in cols:
       x = min(int(col*xdelta),self.width-1)
-      line = Line(x,y0,x,y1,color=self._color)
+      line = Line(x,y0,x,y1,color=self.color)
       self._lines.append(line)
 
   # --- create label at given location   -------------------------------------
@@ -121,20 +121,20 @@ class DataView(BaseGroup):
 
     x_off = justify*self._w_cell/2
     if justify == Justify.LEFT and col == 0:
-      x_off += self._border + self._padding
+      x_off += self.border + self.padding
     elif justify == Justify.LEFT:
-      x_off += self._divider + self._padding
+      x_off += self._divider + self.padding
     if justify == Justify.RIGHT and col == self._cols-1:
-      x_off -= self._border + self._padding
+      x_off -= self.border + self.padding
     elif justify == Justify.RIGHT:
-      x_off -= self._divider + self._padding
+      x_off -= self._divider + self.padding
 
     x_anchor = 0.5*justify
     x        = x_off + col*self._w_cell
     y        = (2*row+1)*self._h_cell/2
 
     t = label.Label(self._font,text=self._text(col+row*self._cols),
-                    color=self._color,
+                    color=self.color,
                     anchor_point=(x_anchor,self._y_anchor),
                     anchored_position=(x,y))
     return t
@@ -193,7 +193,7 @@ class DataView(BaseGroup):
       if color is None:
         return
       # set color for all labels and lines
-      self._color = color
+      self.color = color
       for lbl in self._labels:
         lbl.color = color
       for line in self._lines:
@@ -211,8 +211,8 @@ class DataView(BaseGroup):
 
   def invert(self):
     """ invert colors """
-    color_new = self._bg_color
-    self.set_background(self._color)
+    color_new = self.bg_color
+    self.set_background(self.color)
     self.set_color(color_new)
 
   # --- set font   -----------------------------------------------------------

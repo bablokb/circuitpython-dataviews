@@ -62,23 +62,23 @@ class BaseGroup(displayio.Group):
 
     self.width     = width
     self.height    = height
-    self._bg_color = None
-    self._color    = color
-    self._border   = border
-    self._padding  = padding
+    self.bg_color  = None
+    self.color     = color
+    self.border    = border
+    self.padding   = padding
 
   # --- set background   -----------------------------------------------------
 
   def set_background(self,bg_color):
     """ monochrome background """
 
-    if bg_color == self._bg_color:
+    if bg_color == self.bg_color:
       return
 
-    self._bg_color = bg_color
-    palette        = displayio.Palette(1)
-    palette[0]     = self._bg_color
-    rect           = vectorio.Rectangle(pixel_shader=palette,
+    self.bg_color = bg_color
+    palette       = displayio.Palette(1)
+    palette[0]    = self.bg_color
+    rect          = vectorio.Rectangle(pixel_shader=palette,
                                         width=self.width+1,
                                         height=self.height, x=0, y=0)
     if len(self):
