@@ -86,13 +86,3 @@ class BaseGroup(displayio.Group):
       self[0] = rect
     else:
       self.append(rect)
-
-  # --- set foreground-color   -----------------------------------------------
-
-  def set_color(self,color=None):
-    """ set color. """
-
-    if index is None:
-      if color is None:
-        return
-      self._color = color
