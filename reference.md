@@ -85,6 +85,48 @@ can be changed dynamically.
        rows x cols elements.
 
 
+Class DataPanel
+---------------
+
+A `DataPanel` is a `displayio.Group` with three elements: a title, a footer
+and a `DataView`. It is useful for larger displays, e.g. the Py-Portal. The
+title is always on the top edge of the display, the `DataView` is
+vertically centered and the footer is at the bottom edge.
+
+  - Fixed attributes
+    * `width`: width of the panel in pixels
+    * `height`: height of the panel in pixels
+    * `border`: border-size in pixels
+    * `padding`: added space between content and border
+    * `x=0`    : x-origin within parent group
+    * `y=0`    : y-origin within parent group
+    * `bg_color = Color.BLACK`: background color
+    * `color = Color.WHITE`: color of border and default title/footer color
+
+Title and footer are passed as instances of `PanelText`:
+
+    title = PanelText(text="PyPortal",color=Color.FUCHSIA,
+                      fontname="fonts/DejaVuSansMono-Bold-52-subset.bdf",
+                      justify=Justify.CENTER)
+
+For an usage example, see `examples/pyportal-datapanel.py`.
+
+
+Class PanelText
+---------------
+
+Container for title and footer texts within a `DataPanel`.
+All properties execpt the fontname can be changed after creation.
+
+  - Fixed attributes
+    * `fontname=None` (defaults to `terminalio.Font`)
+
+  - Properties (with getter/setter):
+    * `text`: text
+    * `color`: color of text (defaults to color of `DataPanel`)
+    * `justify`: justification of text (defaults to justification of `DataPanel`)
+
+
 Class DisplayFactory
 --------------------
 
