@@ -22,16 +22,30 @@ from dataviews.Base import BaseGroup, Justify, Color
 class PanelText:
   """ Attributes for title and footer """
 
+  # --- constructor   --------------------------------------------------------
+
   def __init__(self,
                text=None,
                color=None,
                fontname=None,
                justify=Justify.CENTER):
-    self.text    = text
+    self._text    = text
     self.color   = color
     self.font    = (terminalio.FONT if fontname is None else
                     bitmap_font.load_font(fontname))
     self.justify = justify
+
+  # --- get/set text (and update label)   ------------------------------------
+
+  @property
+  def text(self):
+    return self._text
+
+  @text.setter
+  def text(self,text):
+    self._text = text
+    if hasattr(self,"_label"):
+      self._label.text = text
 
 # --- class DataPanel   ------------------------------------------------------
 
@@ -104,12 +118,12 @@ class DataPanel(BaseGroup):
       y_anchor = 1
 
     x_anchor = 0.5*panel_text.justify
-    t = label.Label(panel_text.font,
-                    text=panel_text.text,
-                    color=panel_text.color,
-                    anchor_point=(x_anchor,y_anchor),
-                    anchored_position=(x,y))
-    return t
+    panel_text._label = label.Label(panel_text.font,
+                                    text=panel_text.text,
+                                    color=panel_text.color,
+                                    anchor_point=(x_anchor,y_anchor),
+                                    anchored_position=(x,y))
+    self.append(panel_text._label)
 
   # --- create labels for title and footer   ---------------------------------
 
@@ -117,9 +131,7 @@ class DataPanel(BaseGroup):
     """ create labels for title and footer """
 
     self._title_label = self._create_label(self._title,True)
-    self.append(self._title_label)
     self._footer_label = self._create_label(self._footer,False)
-    self.append(self._footer_label)
 
   # --- add view (vertically centered)   -------------------------------------
 
