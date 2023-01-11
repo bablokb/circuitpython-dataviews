@@ -62,13 +62,15 @@ view.set_color(color=Color.SILVER,index=1)
 view.set_values([None,adt.temperature])
 
 # create DataPanel
+title = PanelText(text="PyPortal",color=Color.FUCHSIA,
+                  fontname="fonts/DejaVuSansMono-Bold-52-subset.bdf",
+                  justify=Justify.CENTER)
+
 panel = DataPanel(
   width=display.width,
   height=display.height,
   view=view,
-  title=PanelText(text="PyPortal",color=Color.FUCHSIA,
-                  fontname="fonts/DejaVuSansMono-Bold-52-subset.bdf",
-                  justify=Justify.CENTER),
+  title=title,
   footer=PanelText(text="https://github.com/bablokb/circuitpython-dataviews",
                    color=Color.SILVER),
   border=1,
@@ -77,6 +79,8 @@ panel = DataPanel(
   )
 
 display.show(panel)
+time.sleep(3)
+title.text = "ADT7410"
 
 while True:
   view.set_values([None,adt.temperature])
