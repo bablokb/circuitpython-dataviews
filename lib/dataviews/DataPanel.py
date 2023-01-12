@@ -25,15 +25,15 @@ class PanelText:
   # --- constructor   --------------------------------------------------------
 
   def __init__(self,
-               text=None,
+               text="",
                color=None,
                fontname=None,
                justify=Justify.CENTER):
     self._text    = text
-    self.color   = color
-    self.font    = (terminalio.FONT if fontname is None else
+    self._color   = color
+    self.font     = (terminalio.FONT if fontname is None else
                     bitmap_font.load_font(fontname))
-    self.justify = justify
+    self._justify = justify
 
   # --- get/set text (and update label)   ------------------------------------
 
@@ -46,6 +46,28 @@ class PanelText:
     self._text = text
     if hasattr(self,"_label"):
       self._label.text = text
+
+  # --- get/set color (and update label)   -----------------------------------
+
+  @property
+  def color(self):
+    return self._color
+
+  @color.setter
+  def color(self,color):
+    self._color = color
+    if hasattr(self,"_label"):
+      self._label.color = color
+
+  # --- get/set justify (does not update label)   -------------------------------
+
+  @property
+  def justify(self):
+    return self._justify
+
+  @justify.setter
+  def justify(self,justify):
+    self._justify = justify
 
 # --- class DataPanel   ------------------------------------------------------
 
@@ -80,8 +102,18 @@ class DataPanel(BaseGroup):
 
     self._view    = view
     self._justify = justify
-    self._title   = PanelText() if not title else title
-    self._footer  = PanelText() if not footer else footer
+
+    self._title   = PanelText(color=color,justify=justify) if not title else title
+    if not self._title.color:
+      self._title.color = color
+    if not self._title.justify:
+      self._title.justify = justify
+
+    self._footer  = PanelText(color=color,justify=justify) if not footer else footer
+    if not self._footer.color:
+      self._footer.color = color
+    if not self._footer.justify:
+      self._footer.justify = justify
 
     # create UI-elements
     self.set_background(bg_color)
