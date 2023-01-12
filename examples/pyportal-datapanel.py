@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------
 # pyportal-datapanel.py
 #
-# A sample application for the DataPanel class.
+# A sample application for the DataPanel class. This program expects to
+# run on a Py-Portal.
 #
 # Author: Bernhard Bablok
 # License: GPL3
@@ -22,25 +23,11 @@ from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView  import DataView
 from dataviews.DataPanel import DataPanel, PanelText
 
-# always release displays (unless you use a builtin-display)
-if not hasattr(board,'DISPLAY'):
-  displayio.release_displays()
-
 # create display
-if hasattr(board,'DISPLAY'):
-  display = board.DISPLAY
-else:
-  display = DisplayFactory.st7789(
-    pin_dc=board.GP16,
-    pin_cs=board.GP17,
-    spi=busio.SPI(clock=board.GP18,MOSI=board.GP19)
-  )
+display = board.DISPLAY
 
-# create sensor
-if hasattr(board,'I2C'):
-  i2c = board.I2C()
-else:
-  i2c = busio.I2C(board.GP27,board.GP26)   # adapt to your needs
+# create sensor-object for internal temperature sensor
+i2c = board.I2C()
 adt = ADT7410(i2c, address=0x48)
 adt.high_resolution = True
 
@@ -80,7 +67,13 @@ panel = DataPanel(
 
 display.show(panel)
 time.sleep(3)
-title.text = "ADT7410"
+
+# update some title attributes
+display.auto_refresh = False
+title.text    = "ADT7410"
+title.color   = Color.YELLOW
+display.refresh()
+display.auto_refresh = True
 
 while True:
   view.set_values([None,adt.temperature])
