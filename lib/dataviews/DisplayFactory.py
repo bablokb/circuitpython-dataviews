@@ -71,3 +71,12 @@ class DisplayFactory:
                              reset=pin_rst)
     return ST7735R(bus,width=width,height=height,
                    rotation=rotation,bgr=bgr)
+
+  # --- create pygame-based display   ----------------------------------------
+
+  @staticmethod
+  def pygame(height=400,width=600):
+    """ factory-method for pygame-based displays """
+
+    from blinka_displayio_pygamedisplay import PyGameDisplay
+    return PyGameDisplay(width=width,height=height)
