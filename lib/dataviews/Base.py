@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------
 
 import displayio
-import vectorio
+from adafruit_display_shapes.rect import Rect
 
 class Color:
   """some basic colors (see: https://en.wikipedia.org/wiki/Web_colors) """
@@ -76,11 +76,8 @@ class BaseGroup(displayio.Group):
       return
 
     self.bg_color = bg_color
-    palette       = displayio.Palette(1)
-    palette[0]    = self.bg_color
-    rect          = vectorio.Rectangle(pixel_shader=palette,
-                                        width=self.width+1,
-                                        height=self.height, x=0, y=0)
+    rect          = Rect(x=0, y=0,width=self.width,height=self.height,
+                         fill=bg_color,outline=self.color,stroke=self.border)
     if len(self):
       # background is always the first layer, exchange it
       self[0] = rect
