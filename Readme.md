@@ -61,5 +61,5 @@ Usage
 -----
 
 There are a number of programs in the `examples`-directory that can serve
-as a blueprint. See <reference.md> for a quick cheat-sheet of classes and
-methods. The ultimate reference is of course the source-code.
+as a blueprint. See [reference.md](reference.md) for a quick cheat-sheet
+of classes and methods. The ultimate reference is of course the source-code.
