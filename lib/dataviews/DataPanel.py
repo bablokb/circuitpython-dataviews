@@ -118,18 +118,9 @@ class DataPanel(BaseGroup):
     # create UI-elements
     self.set_background(bg_color)
     if border:
-      self._add_border()
+      self.add_border()
     self._create_labels()
     self._add_view()
-
-  # --- create border   ------------------------------------------------------
-
-  def _add_border(self):
-    """ create border """
-
-    rect = Rect(0,0,self.width,self.height,
-                fill=None,outline=self.color,stroke=self.border)
-    self.append(rect)
 
   # --- create labels for title and footer   ---------------------------------
 

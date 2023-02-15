@@ -83,3 +83,12 @@ class BaseGroup(displayio.Group):
       self[0] = rect
     else:
       self.append(rect)
+
+  # --- create border   ------------------------------------------------------
+
+  def add_border(self):
+    """ create border """
+
+    rect = Rect(0,0,self.width,self.height,
+                fill=None,outline=self.color,stroke=self.border)
+    self.append(rect)
