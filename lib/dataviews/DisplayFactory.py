@@ -75,8 +75,8 @@ class DisplayFactory:
   # --- create pygame-based display   ----------------------------------------
 
   @staticmethod
-  def pygame(height=400,width=600):
+  def pygame(height=400,width=600,**kwargs):
     """ factory-method for pygame-based displays """
 
     from blinka_displayio_pygamedisplay import PyGameDisplay
-    return PyGameDisplay(width=width,height=height)
+    return PyGameDisplay(width=width,height=height,**kwargs)
