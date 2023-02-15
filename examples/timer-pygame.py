@@ -46,15 +46,13 @@ def pp_timer(seconds):
 timer    = 0
 values   = ["00:00"]
 
-start = time.monotonic()
 view.set_values(values)
 display.show(view)
 
-while display.running:
-  overhead = time.monotonic() - start
-  time.sleep(max(0,1-overhead))
-
-  start = time.monotonic()
+def on_time():
+  global timer
   timer += 1
   values[0] = pp_timer(timer)
   view.set_values(values)
+
+display.event_loop(interval=1,on_time=on_time)

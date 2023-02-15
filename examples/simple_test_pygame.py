@@ -27,7 +27,7 @@ if not hasattr(board,'DISPLAY'):
 if hasattr(board,'DISPLAY'):
   display = board.DISPLAY
 else:
-  display = DisplayFactory.pygame(width=240,height=135)
+  display = DisplayFactory.pygame(width=240,height=135,native_frames_per_second=1)
 
 # create view
 view = DataView(
@@ -79,11 +79,12 @@ for index in [1,3,5]:
                               (Color.WHITE,24),(Color.RED,None)])
 time.sleep(3)
 
-while display.running:
-  for i in range(30):
-    if not display.running:
-      break
-    view.set_values([None,i,
-                     None,2.0*i/3.0,
-                     None,30-i])
-    time.sleep(1)
+i = 0
+def on_time():
+  global i
+  view.set_values([None,i,
+                   None,2.0*i/3.0,
+                   None,30-i])
+  i = (i+1)%30
+
+display.event_loop(interval=1,on_time=on_time)

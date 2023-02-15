@@ -20,7 +20,8 @@ from dataviews.DataView  import DataView
 from dataviews.DataPanel import DataPanel, PanelText
 
 # create display
-display = DisplayFactory.pygame(width=320,height=240)
+display = DisplayFactory.pygame(width=320,height=240,native_frames_per_second=1)
+display.auto_refresh=False
 
 # simulate sensor-object for internal temperature sensor
 class ADT7410:
@@ -62,13 +63,17 @@ panel = DataPanel(
   )
 
 display.show(panel)
+display.refresh()
 time.sleep(3)
 
 # update some title attributes
 title.text    = "ADT7410"
 title.color   = Color.YELLOW
+#display.auto_refresh=True
 display.refresh()
 
-while display.running:
+def on_time():
   view.set_values([None,adt.temperature])
-  time.sleep(5)
+  display.refresh()
+
+display.event_loop(interval=5,on_time=on_time)
