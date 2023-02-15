@@ -69,10 +69,10 @@ class BaseGroup(displayio.Group):
 
   # --- set background   -----------------------------------------------------
 
-  def set_background(self,bg_color):
+  def set_background(self,bg_color,force=False):
     """ monochrome background """
 
-    if bg_color == self.bg_color:
+    if bg_color == self.bg_color and not force:
       return
 
     self.bg_color = bg_color
