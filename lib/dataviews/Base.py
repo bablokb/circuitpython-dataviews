@@ -97,3 +97,37 @@ class BaseGroup(displayio.Group):
                 fill=None,outline=self.color,stroke=bsize)
     if is_new:
       self.append(self._border)
+
+  # --- get/set text (and update label)   ------------------------------------
+
+  @property
+  def text(self):
+    return self._text
+
+  @text.setter
+  def text(self,text):
+    self._text = text
+    if hasattr(self,"_label"):
+      self._label.text = text
+
+  # --- get/set color (and update label)   -----------------------------------
+
+  @property
+  def color(self):
+    return self._color
+
+  @color.setter
+  def color(self,color):
+    self._color = color
+    if hasattr(self,"_label"):
+      self._label.color = color
+
+  # --- get/set justify (does not update label)   -------------------------------
+
+  @property
+  def justify(self):
+    return self._justify
+
+  @justify.setter
+  def justify(self,justify):
+    self._justify = justify
