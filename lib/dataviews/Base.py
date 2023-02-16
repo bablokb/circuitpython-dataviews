@@ -66,6 +66,7 @@ class BaseGroup(displayio.Group):
     self.color     = color
     self.border    = border
     self.padding   = padding
+    self._border   = None         # border rectangle
 
   # --- set background   -----------------------------------------------------
 
@@ -86,9 +87,13 @@ class BaseGroup(displayio.Group):
 
   # --- create border   ------------------------------------------------------
 
-  def add_border(self):
-    """ create border """
+  def add_border(self,bsize=None):
+    """ (re) create border """
 
-    rect = Rect(0,0,self.width,self.height,
-                fill=None,outline=self.color,stroke=self.border)
-    self.append(rect)
+    if bsize is None:
+      bsize = self.border
+    is_new = self._border is None
+    self._border = Rect(0,0,self.width,self.height,
+                fill=None,outline=self.color,stroke=bsize)
+    if is_new:
+      self.append(self._border)
