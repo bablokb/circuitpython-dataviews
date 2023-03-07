@@ -8,6 +8,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import gc
 import displayio
 from adafruit_display_shapes.rect import Rect
 
@@ -68,22 +69,32 @@ class BaseGroup(displayio.Group):
     self.padding   = padding
     self._border   = None         # border rectangle
 
+    self._background = displayio.Group()
+    self.append(self._background)
+    self.set_background()
+
   # --- set background   -----------------------------------------------------
 
-  def set_background(self,bg_color,force=False):
+  def set_background(self,bg_color=None):
     """ monochrome background """
 
-    if bg_color == self.bg_color and not force:
+    if bg_color == None:
+      if len(self._background):
+        del self._background[0]
+        gc.collect()
+      return
+
+    if bg_color == self.bg_color:
       return
 
     self.bg_color = bg_color
-    rect          = Rect(x=0, y=0,width=self.width,height=self.height,
-                         fill=bg_color,outline=self.color,stroke=self.border)
-    if len(self):
-      # background is always the first layer, exchange it
-      self[0] = rect
+    rect = Rect(x=0, y=0,width=self.width,height=self.height,
+                fill=bg_color,outline=self.color,stroke=self.border)
+    if len(self._background):
+      self._background[0] = rect
+      gc.collect()
     else:
-      self.append(rect)
+      self._background.append(rect)
 
   # --- create border   ------------------------------------------------------
 
