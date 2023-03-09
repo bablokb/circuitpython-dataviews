@@ -67,7 +67,6 @@ class BaseGroup(displayio.Group):
     self.color     = color
     self.border    = border
     self.padding   = padding
-    self._border   = None         # border rectangle
 
     self._background = displayio.Group()
     self.append(self._background)
@@ -75,39 +74,26 @@ class BaseGroup(displayio.Group):
 
   # --- set background   -----------------------------------------------------
 
-  def set_background(self,bg_color=None):
-    """ monochrome background """
+  def set_background(self,bg_color=-1,color=-1,border=-1):
+    """ monochrome background and border.
+    Arguments override object-attributes. """
 
-    if bg_color == None:
-      if len(self._background):
-        del self._background[0]
-        gc.collect()
+    if not self.width and not self.height:
       return
+    if bg_color == -1:
+      bg_color = self.bg_color
+    if color == -1:
+      color = self.color
+    if border == -1:
+      border = self.border
 
-    if bg_color == self.bg_color:
-      return
-
-    self.bg_color = bg_color
     rect = Rect(x=0, y=0,width=self.width,height=self.height,
-                fill=bg_color,outline=self.color,stroke=self.border)
+                fill=bg_color,outline=color,stroke=border)
     if len(self._background):
       self._background[0] = rect
       gc.collect()
     else:
       self._background.append(rect)
-
-  # --- create border   ------------------------------------------------------
-
-  def add_border(self,bsize=None):
-    """ (re) create border """
-
-    if bsize is None:
-      bsize = self.border
-    is_new = self._border is None
-    self._border = Rect(0,0,self.width,self.height,
-                fill=None,outline=self.color,stroke=bsize)
-    if is_new:
-      self.append(self._border)
 
   # --- get/set text (and update label)   ------------------------------------
 

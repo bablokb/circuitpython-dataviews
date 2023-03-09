@@ -83,8 +83,6 @@ class DataPanel(BaseGroup):
 
     # create UI-elements
     self.set_background(bg_color)
-    if border:
-      self.add_border()
     self._create_labels()
     self._add_view()
 
