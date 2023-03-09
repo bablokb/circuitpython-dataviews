@@ -94,37 +94,3 @@ class BaseGroup(displayio.Group):
       gc.collect()
     else:
       self._background.append(rect)
-
-  # --- get/set text (and update label)   ------------------------------------
-
-  @property
-  def text(self):
-    return self._text
-
-  @text.setter
-  def text(self,text):
-    self._text = text
-    if hasattr(self,"_label"):
-      self._label.text = text
-
-  # --- get/set color (and update label)   -----------------------------------
-
-  @property
-  def color(self):
-    return self._color
-
-  @color.setter
-  def color(self,color):
-    self._color = color
-    if hasattr(self,"_label"):
-      self._label.color = color
-
-  # --- get/set justify (does not update label)   -------------------------------
-
-  @property
-  def justify(self):
-    return self._justify
-
-  @justify.setter
-  def justify(self,justify):
-    self._justify = justify
