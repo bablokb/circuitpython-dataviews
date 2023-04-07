@@ -63,7 +63,7 @@ class BaseGroup(displayio.Group):
 
     self.width     = width
     self.height    = height
-    self.bg_color  = None
+    self.bg_color  = bg_color
     self.color     = color
     self.border    = border
     self.padding   = padding
