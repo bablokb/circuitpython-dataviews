@@ -5,6 +5,7 @@ TODO
 doc.local
 test
 lib/adafruit*
+lib/InkyPack.py
 *secrets.py
 *configuration.py
 boot_out.txt
