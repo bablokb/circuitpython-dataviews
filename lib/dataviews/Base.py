@@ -10,7 +10,7 @@
 
 import gc
 import displayio
-from adafruit_display_shapes.rect import Rect
+from vectorio import Rectangle
 
 class Color:
   """some basic colors (see: https://en.wikipedia.org/wiki/Web_colors) """
@@ -80,17 +80,34 @@ class BaseGroup(displayio.Group):
 
     if not self.width and not self.height:
       return
-    if bg_color == -1:
-      bg_color = self.bg_color
-    if color == -1:
-      color = self.color
+
+    shader = displayio.Palette(2)
+    if bg_color != -1:
+      shader[0] = bg_color
+    else:
+      shader[0] = self.bg_color
+
+    if color != -1:
+      shader[1] = color
+    else:
+      shader[1] = self.color
+
     if border == -1:
       border = self.border
 
-    rect = Rect(x=0, y=0,width=self.width,height=self.height,
-                fill=bg_color,outline=color,stroke=border)
-    if len(self._background):
-      self._background[0] = rect
-      gc.collect()
-    else:
-      self._background.append(rect)
+    for _ in range(len(self._background)):
+      self._background.pop()
+    gc.collect()
+
+    if border > 0:
+      # needs two rectangles
+      b1 = Rectangle(pixel_shader=shader,x=0,y=0,
+                     width=self.width,
+                     height=self.height,
+                     color_index=1)
+      self._background.append(b1)
+    b2 = Rectangle(pixel_shader=shader,x=border,y=border,
+                   width=self.width-2*border,
+                   height=self.height-2*border,
+                   color_index=0)
+    self._background.append(b2)

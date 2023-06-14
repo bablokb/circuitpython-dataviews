@@ -12,7 +12,6 @@
 import displayio
 import terminalio
 from adafruit_display_text import label
-from adafruit_display_shapes.rect import Rect
 from adafruit_bitmap_font import bitmap_font
 
 from dataviews.Base import BaseGroup, Justify, Color
