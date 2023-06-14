@@ -55,6 +55,16 @@ class DisplayFactory:
     return ST7789(bus,width=width,height=height,rotation=rotation,
                   rowstart=rowstart,colstart=colstart)
 
+  # --- cerate ST7789-based display for the Pimoroni Pico-Display-Pack  ------
+
+  @staticmethod
+  def display_pack(spi=None):
+    """ factory-method for a Display-Pack display """
+
+    if spi is None:
+      spi = busio.SPI(clock=board.GP18,MOSI=board.GP19)
+    return DisplayFactory.st7789(pin_dc=board.GP16,pin_cs=board.GP17,spi)
+
   # --- create ST7735-based SPI-display   ------------------------------------
 
   @staticmethod
