@@ -90,3 +90,20 @@ class DisplayFactory:
 
     from blinka_displayio_pygamedisplay import PyGameDisplay
     return PyGameDisplay(width=width,height=height,**kwargs)
+
+  # --- create display for Pimoronis Pico Inky-Pack   -------------------------
+
+  @staticmethod
+  def inky_pack(spi=None):
+    """ create display for InkyPack """
+
+    import InkyPack
+
+    if spi is None:
+      spi = busio.SPI(board.GP18,MOSI=board.GP19)
+
+    display_bus = displayio.FourWire(
+      spi, command=board.GP20, chip_select=board.GP17,
+      reset=board.GP21, baudrate=1000000
+    )
+    return InkyPack.InkyPack(display_bus,busy_pin=board.GP26)
