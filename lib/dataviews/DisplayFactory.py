@@ -63,7 +63,7 @@ class DisplayFactory:
 
     if spi is None:
       spi = busio.SPI(clock=board.GP18,MOSI=board.GP19)
-    return DisplayFactory.st7789(pin_dc=board.GP16,pin_cs=board.GP17,spi)
+    return DisplayFactory.st7789(pin_dc=board.GP16,pin_cs=board.GP17,spi=spi)
 
   # --- create ST7735-based SPI-display   ------------------------------------
 
