@@ -25,16 +25,17 @@ class DisplayFactory:
   # --- create SSD1306-based I2C-display   -----------------------------------
 
   @staticmethod
-  def ssd1306(sda=None,scl=None,width=128,height=64,addr=0x3c):
+  def ssd1306(i2c=None,sda=None,scl=None,width=128,height=64,addr=0x3c):
     """ factory-method for SSD1306-based I2C-displays """
 
     from adafruit_displayio_ssd1306 import SSD1306
 
-    if sda is None:
-      sda = board.SDA
-    if scl is None:
-      scl = board.SCL
-    i2c = busio.I2C(sda=sda,scl=scl,frequency=400000)
+    if i2c is None:
+      if sda is None:
+        sda = board.SDA
+      if scl is None:
+        scl = board.SCL
+      i2c = busio.I2C(sda=sda,scl=scl,frequency=400000)
     display_bus = displayio.I2CDisplay(i2c, device_address=addr)
     return SSD1306(display_bus,width=width,height=height)
 
