@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------
-# inky_pack-datapanel.py
+# ada-datapanel.py
 #
-# A sample application for the DataPanel class.
+# A sample application for the DataPanel class using various Adafruit e-ink
+# displays.
 #
 # Author: Bernhard Bablok
 # License: GPL3
@@ -9,6 +10,11 @@
 # Website: https://github.com/bablokb/circuitpython-dataviews
 #
 # ----------------------------------------------------------------------------
+
+#DISPLAY="ADA_2_13_MONO"
+#DISPLAY="ADA_1_54_MONO"
+#DISPLAY="ADA_1_5_COLOR"
+DISPLAY="InkyPack"
 
 import board
 import time
@@ -25,8 +31,11 @@ if not hasattr(board,'DISPLAY'):
   displayio.release_displays()
 
 # create display
+print(f"using display: {DISPLAY}")
 if hasattr(board,'DISPLAY'):
   display = board.DISPLAY
+elif DISPLAY == "InkyPack":
+  display = DisplayFactory.inky_pack()
 else:
   epd_cs    = board.GP9
   epd_dc    = board.GP8
@@ -36,8 +45,16 @@ else:
   epd_mosi  = board.GP11
 
   spi = busio.SPI(epd_sck,MOSI=epd_mosi)
-  display = DisplayFactory.ada_2_13_mono(
-    pin_dc=epd_dc,pin_cs=epd_cs,spi=spi,pin_rst=epd_reset,pin_busy=epd_busy)
+
+  if DISPLAY == "ADA_2_13_MONO":
+    display = DisplayFactory.ada_2_13_mono(
+      pin_dc=epd_dc,pin_cs=epd_cs,spi=spi,pin_rst=epd_reset,pin_busy=epd_busy)
+  elif DISPLAY == "ADA_1_54_MONO":
+    display = DisplayFactory.ada_1_54_mono(
+      pin_dc=epd_dc,pin_cs=epd_cs,spi=spi,pin_rst=epd_reset,pin_busy=epd_busy)
+  elif DISPLAY == "ADA_1_5_COLOR":
+    display = DisplayFactory.ada_1_5_color(
+      pin_dc=epd_dc,pin_cs=epd_cs,spi=spi,pin_rst=epd_reset,pin_busy=epd_busy)
 
 FONT_NAME="DejaVuSans-16-subset.bdf"
 

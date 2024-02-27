@@ -127,3 +127,47 @@ class DisplayFactory:
     )
     return adafruit_ssd1675.SSD1675(display_bus, width=250, height=122,
                                     busy_pin=pin_busy, rotation=rotation)
+
+  # --- create display for Adafruits monochrome 1.54" e-ink   ----------------
+
+  @staticmethod
+  def ada_1_54_mono(pin_dc,pin_cs,spi=None,pin_rst=None,pin_busy=None,
+                    rotation=0):
+    """
+    create display for 1.54 monochrome display.
+    Note that Adafruit also sells a SSD1681-variant of the display.
+    """
+
+    import adafruit_ssd1608
+
+    if spi is None:
+      spi = board.SPI()
+
+    display_bus = displayio.FourWire(
+      spi, command=pin_dc, chip_select=pin_cs,
+      reset=pin_rst, baudrate=1000000
+    )
+    return adafruit_ssd1608.SSD1608(display_bus, width=200, height=200,
+                                    busy_pin=pin_busy, rotation=rotation)
+
+  # --- create display for Adafruits tri-color 1.5" e-ink   ------------------
+
+  @staticmethod
+  def ada_1_5_color(pin_dc,pin_cs,spi=None,pin_rst=None,pin_busy=None,
+                    rotation=180):
+    """ create display for 1.54 tri-color display """
+
+    import adafruit_il0373
+
+    if spi is None:
+      spi = board.SPI()
+
+    display_bus = displayio.FourWire(
+      spi, command=pin_dc, chip_select=pin_cs,
+      reset=pin_rst, baudrate=1000000
+    )
+
+    return adafruit_il0373.IL0373(display_bus,width=152,height=152,
+                                  busy_pin=pin_busy,
+                                  highlight_color=0xFF0000,
+                                  rotation=roation)
