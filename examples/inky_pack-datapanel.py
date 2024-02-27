@@ -28,7 +28,7 @@ if not hasattr(board,'DISPLAY'):
 if hasattr(board,'DISPLAY'):
   display = board.DISPLAY
 else:
-  display = DisplayFactory.inky_pack()(
+  display = DisplayFactory.inky_pack()
 
 # create view and panel
 _formats = ['Bat', '{0:0.1f}V',
