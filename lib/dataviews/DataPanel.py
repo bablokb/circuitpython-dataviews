@@ -34,7 +34,6 @@ class PanelText:
                     bitmap_font.load_font(fontname))
     self._justify = justify
 
-
   # --- get/set text (and update label)   ------------------------------------
 
   @property
@@ -106,14 +105,10 @@ class DataPanel(BaseGroup):
     self._title   = PanelText(color=color,justify=justify) if not title else title
     if not self._title.color:
       self._title.color = color
-    if not self._title.justify:
-      self._title.justify = justify
 
     self._footer  = PanelText(color=color,justify=justify) if not footer else footer
     if not self._footer.color:
       self._footer.color = color
-    if not self._footer.justify:
-      self._footer.justify = justify
 
     # create UI-elements
     self.set_background(bg_color)
