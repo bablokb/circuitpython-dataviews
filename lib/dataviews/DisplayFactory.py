@@ -14,6 +14,24 @@ import board
 import busio
 import displayio
 
+# --- helper-function for Inky-displays   -------------------------------------
+
+def get_inky_info(i2c):
+  """ try to return tuple (width,height,color) """
+  from adafruit_bus_device.i2c_device import I2CDevice
+  import struct
+  COLOR = [None, 'black', 'red', 'yellow', None, 'acep7']
+
+  EE_ADDR = 0x50
+  i2c_device = I2CDevice(i2c,EE_ADDR)
+  buffer = bytearray(29)
+  with i2c_device as i2c:
+    i2c.write(bytes([0x00])+bytes([0x00]))
+    i2c.write_then_readinto(bytes([0x00]),buffer)
+
+  data = struct.unpack('<HHBBB22s',buffer)
+  return [data[0],data[1],COLOR[data[2]]]
+
 class DisplayFactory:
 
   # --- return builtin-display   ---------------------------------------------
@@ -171,3 +189,41 @@ class DisplayFactory:
                                   busy_pin=pin_busy,
                                   highlight_color=0xFF0000,
                                   rotation=roation)
+
+  # --- create display for Pimoroni Inky-displays   --------------------------
+
+  @staticmethod
+  def pimoroni_inky(i2c=None,sda=None,scl=None,
+                    spi=None,pin_dc=None,pin_cs=None,
+                    pin_rst=None,pin_busy=None):
+    """ create display for e-inks from Pimoroni """
+
+    if i2c is None:
+      if sda is None:
+        sda = board.SDA
+      if scl is None:
+        scl = board.SCL
+      i2c = busio.I2C(sda=sda,scl=scl,frequency=400000)
+    width,height,color = get_inky_info(i2c)
+
+    if spi is None:
+      spi = board.SPI()
+
+    display_bus = displayio.FourWire(
+      spi, command=pin_dc, chip_select=pin_cs,
+      reset=pin_rst, baudrate=1000000
+    )
+
+    if color == 'acep7': # assume Inky-Impression
+      import adafruit_spd1656
+      display = adafruit_spd1656.SPD1656(display_bus,busy_pin=pin_busy,
+                                         width=width,height=height,
+                                         refresh_time=2,
+                                         seconds_per_frame=40)
+    else: # assume Inky-wHat
+      import what
+      display = what.Inky_wHat(display_bus,busy_pin=pin_busy,
+                               color=color,border_color=color,
+                               black_bits_inverted=False)
+    display.auto_refresh = False
+    return display
