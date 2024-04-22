@@ -223,7 +223,7 @@ class DisplayFactory:
     else: # assume Inky-wHat
       import what
       display = what.Inky_wHat(display_bus,busy_pin=pin_busy,
-                               color=color,border_color=color,
+                               color=color,border_color='white',
                                black_bits_inverted=False)
     display.auto_refresh = False
     return display
