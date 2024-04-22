@@ -30,10 +30,11 @@ class DataView(BaseGroup):
                dim,                         # dimension of data (rows,cols)
                width,                       # width view
                height,                      # height of view
+               col_width=None,              # column width
                bg_color=Color.BLACK,         # background color
                color=Color.WHITE,            # (foreground) color
                border=0,                    # border-size in pixels
-               divider=0,                   # divider-size in pixels
+               divider=False,               # print divider
                padding=1,                   # padding next to border/divider
                fontname=None,               # font (defaults to terminalio.FONT
                justify=Justify.RIGHT,          # justification of labels
@@ -60,38 +61,63 @@ class DataView(BaseGroup):
                       else ['{0}' for i in range(dim[0]*dim[1])])
     self._values   = None
     self._color_r  = {}
+    self._lines    = None
+    self._labels   = None
 
     # some constant values that depend on dim and width/height
     self._rows     = self._dim[0]
     self._cols     = self._dim[1]
-    self._w_cell   = self.width/self._cols
+
+    # calculate column-width and column-start lists
+    if col_width is None:
+      self._w_cell   = [int(self.width/self._cols) for _ in range(self._cols)]
+    elif not isinstance(col_width,str):
+      self._w_cell = col_width
+    else:
+      self._w_cell = None                    # automatic
     self._h_cell   = self.height/self._rows
     self._y_anchor = 0.5
 
-    # create UI-elements
-    self.set_background(bg_color)
-    self._create_lines()
-    self._create_labels()
+    # calculate x-coordinates of column start:
+    # a column starts on the next pixel right from the border/divider
+    if self._w_cell:
+      self._x_cells = [border]
+      for w in self._w_cell[:-1]:
+        # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
+        self._x_cells.append(min(self._x_cells[-1]-1+w+1+1,self.width-1))
+
+    self.set_background(bg_color)            # create UI-elements
+    if self._w_cell is not None:             # static column width
+      self._create_lines()
+      self._create_labels()
 
   # --- create border and dividers   -----------------------------------------
 
   def _create_lines(self):
     """ create border and dividers """
 
-    self._lines = displayio.Group()
-    self.append(self._lines)
+    if self._lines:
+      # remove old lines
+      for _ in range(len(self._lines)):
+        self._lines.pop(0)
+      gc.collect()
+    else:
+      self._lines = displayio.Group()
+      self.append(self._lines)
+
     if self.border and self._divider:
       # all lines
       rows = range(0,self._rows+1)
-      cols = range(0,self._cols+1)
+      x_cols = [x_cell-1 for x_cell in self._x_cells]
+      x_cols.append(min(x_cols[-1]+self._w_cell[-1]+1,self.width-1))
     elif self.border and not self._divider:
       # only outer lines
       rows = [0,self._rows+1]
-      cols = [0,self._cols+1]
+      x_cols = [0,self.width-1]
     elif self._divider:
       # only inner lines
       rows = range(1,self._rows)
-      cols = range(1,self._cols)
+      x_cols = [x_cell-1 for x_cell in self._x_cells[1:]]
     else:
       # no lines at all
       return
@@ -108,10 +134,8 @@ class DataView(BaseGroup):
     # draw vertical lines
     y0 = 0
     y1 = self.height-1
-    xdelta = float(self.width/self._cols)
-    for col in cols:
-      x = min(int(col*xdelta),self.width-1)
-      line = Line(x,y0,x,y1,color=self.color)
+    for x_col in x_cols:
+      line = Line(x_col,y0,x_col,y1,color=self.color)
       self._lines.append(line)
 
   # --- create label at given location   -------------------------------------
@@ -119,18 +143,17 @@ class DataView(BaseGroup):
   def _create_label(self,row,col,justify):
     """ create text at given location """
 
-    x_off = justify*self._w_cell/2
-    if justify == Justify.LEFT and col == 0:
-      x_off += self.border + self.padding
-    elif justify == Justify.LEFT:
-      x_off += self._divider + self.padding
-    if justify == Justify.RIGHT and col == self._cols-1:
-      x_off -= self.border + self.padding
+    if justify == Justify.LEFT:
+      # start of cell plus padding
+      x = self._x_cells[col] + self.padding
     elif justify == Justify.RIGHT:
-      x_off -= self._divider + self.padding
+      # start of cell + cell-width minus padding
+      x = min(self._x_cells[col] + self._w_cell[col],self.width-1) - self.padding
+    else:
+      # start of cell + 0.5*cell-width
+      x = self._x_cells[col] + self._w_cell[col]/2
 
     x_anchor = 0.5*justify
-    x        = x_off + col*self._w_cell
     y        = (2*row+1)*self._h_cell/2
 
     t = label.Label(self._font,text=self._text(col+row*self._cols),
@@ -170,14 +193,19 @@ class DataView(BaseGroup):
   def _create_labels(self):
     """ create fields """
 
-    self._labels = displayio.Group()
+    if self._labels:
+      # remove old labels
+      for _ in len(self._labels):
+        self._labels.pop(0)
+      gc.collect()
+    else:
+      self._labels = displayio.Group()
+      self.append(self._labels)
+
     for row in range(self._rows):
       for col in range(self._cols):
         lbl = self._create_label(row,col,self._justify)
         self._labels.append(lbl)
-
-    # append labels as sub-group to ourselves
-    self.append(self._labels)
 
   # --- set foreground-color   -----------------------------------------------
 
@@ -211,9 +239,11 @@ class DataView(BaseGroup):
 
   def invert(self):
     """ invert colors """
-    color_new = self.bg_color
-    self.set_background(self.color)
-    self.set_color(color_new)
+    fg_new = self.bg_color
+    bg_new = self.color
+    self.set_background(bg_new)
+    self.set_color(fg_new)
+    self.bg_color = bg_new
 
   # --- set font   -----------------------------------------------------------
 
@@ -260,6 +290,14 @@ class DataView(BaseGroup):
   def set_values(self,values):
     """ set values """
     self._values = values
-    for i in range(len(values)):
-      self._labels[i].text = self._text(i)
-      self._labels[i].color = self._value2color(i)
+
+    # static column width
+    if self._w_cell:
+      for i in range(len(values)):
+        self._labels[i].text = self._text(i)
+        self._labels[i].color = self._value2color(i)
+
+    # dynamic column width
+    else:
+      self._create_lines()
+      self._create_labels()
