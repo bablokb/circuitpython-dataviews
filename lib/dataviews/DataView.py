@@ -58,12 +58,12 @@ class DataView(BaseGroup):
                       bitmap_font.load_font(fontname))
 
     if isinstance(justify,int):
-      self._justify = [justify for i in range(dim[0]*dim[1])]
+      self._justify = [justify]*(dim[0]*dim[1])
     else:
       self._justify  = justify
 
     self._formats  = (formats if formats is not None
-                      else ['{0}' for i in range(dim[0]*dim[1])])
+                      else ['{0}']*(dim[0]*dim[1]))
     self._values   = None
     self._color_r  = {}
     self._lines    = None
@@ -74,25 +74,32 @@ class DataView(BaseGroup):
     self._cols     = self._dim[1]
 
     # calculate column-width and column-start lists
+    self._weight_cells = None
     if col_width is None:
-      self._w_cell   = [int(self.width/self._cols) for _ in range(self._cols)]
+      self._width_cells = [int(self.width/self._cols)]*self._cols
     elif not isinstance(col_width,str):
-      self._w_cell = col_width
+      if col_width[0] < 1:
+        self._width_cells = 'AUTO'
+        self._weight_cells = col_width
+      else:
+        self._width_cells = col_width
     else:
-      self._w_cell = None                    # automatic
+      self._width_cells = 'AUTO'
+      self._weight_cells = [1/self._cols]*self_cols
+
     self._h_cell   = self.height/self._rows
     self._y_anchor = 0.5
 
     # calculate x-coordinates of column start:
     # a column starts on the next pixel right from the border/divider
-    if self._w_cell:
+    if self._width_cells != 'AUTO':
       self._x_cells = [border]
-      for w in self._w_cell[:-1]:
+      for w in self._width_cells[:-1]:
         # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
         self._x_cells.append(min(self._x_cells[-1]-1+w+1+1,self.width-1))
 
     self.set_background(bg_color)            # create UI-elements
-    if self._w_cell is not None:             # static column width
+    if self._width_cells != 'AUTO':          # static column width
       self._create_lines()
       self._create_labels()
 
@@ -114,7 +121,7 @@ class DataView(BaseGroup):
       # all lines
       rows = range(0,self._rows+1)
       x_cols = [x_cell-1 for x_cell in self._x_cells]
-      x_cols.append(min(x_cols[-1]+self._w_cell[-1]+1,self.width-1))
+      x_cols.append(min(x_cols[-1]+self._width_cells[-1]+1,self.width-1))
     elif self.border and not self._divider:
       # only outer lines
       rows = [0,self._rows+1]
@@ -154,10 +161,10 @@ class DataView(BaseGroup):
       x = self._x_cells[col] + self.padding
     elif justify == Justify.RIGHT:
       # start of cell + cell-width minus padding
-      x = min(self._x_cells[col] + self._w_cell[col],self.width-1) - self.padding
+      x = min(self._x_cells[col] + self._width_cells[col],self.width-1) - self.padding
     else:
       # start of cell + 0.5*cell-width
-      x = self._x_cells[col] + self._w_cell[col]/2
+      x = self._x_cells[col] + self._width_cells[col]/2
 
     x_anchor = 0.5*justify
     y        = (2*row+1)*self._h_cell/2
@@ -271,10 +278,10 @@ class DataView(BaseGroup):
   def justify(self,justify,index=None):
     """ set justification within cell """
 
-    if not self._w_cell:    # dynamic cell-width, just save justify
+    if self._width_cells == 'AUTO':
       if index is None:
         if isinstance(justify,int):
-          self._justify = [justify for i in range(self._dim[0]*self._dim[1])]
+          self._justify = [justify]*(self._dim[0]*self._dim[1])
         else:
           self._justify  = justify
       else:
@@ -284,7 +291,7 @@ class DataView(BaseGroup):
     if index is None:
       # justify all labels
       if isinstance(justify,int):
-        self._justify = [justify for i in range(self._dim[0]*self._dim[1])]
+        self._justify = [justify]*(self._dim[0]*self._dim[1])
       else:
         self._justify  = justify
       self._create_labels()
@@ -310,7 +317,7 @@ class DataView(BaseGroup):
     self._values = values
 
     # static column width
-    if self._w_cell:
+    if self._width_cells != 'AUTO':
       for i in range(len(values)):
         self._labels[i].text = self._text(i)
         self._labels[i].color = self._value2color(i)
