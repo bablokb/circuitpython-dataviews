@@ -25,16 +25,23 @@ display = DisplayFactory.pygame(width=296,height=128,native_frames_per_second=1)
 display.auto_refresh=False
 
 # create view and panel
-_formats = ['Bat', '{0:0.1f}V',
+_formats = ['Bat:', '{0:0.1f}V',
             'T1:', '{0:.1f}°C',
             'Hum:', '{0:.0f}%rH',
             'T2:', '{0:.1f}°C']
 dim = (3,4)
+
+width = 280
+col_width = [int(width/4) for _ in range(4)]
+col_width = [50,90,50,90]
+col_width = None
+
 _formats.extend(
   ["" for _ in range(dim[0]*dim[1] - len(_formats))])
 _view = DataView(
   dim=dim,
-  width=display.width-2-(dim[1]-1),height=int(0.6*display.height),
+  width=width,height=int(0.6*display.height),
+  col_width=col_width,
   fontname="fonts/DejaVuSansMono-Bold-18-subset.bdf",
   formats=_formats,
   border=1,
