@@ -56,7 +56,12 @@ class DataView(BaseGroup):
     self._divider  = divider
     self._font     = (terminalio.FONT if fontname is None else
                       bitmap_font.load_font(fontname))
-    self._justify  = justify
+
+    if isinstance(justify,int):
+      self._justify = [justify for i in range(dim[0]*dim[1])]
+    else:
+      self._justify  = justify
+
     self._formats  = (formats if formats is not None
                       else ['{0}' for i in range(dim[0]*dim[1])])
     self._values   = None
@@ -140,9 +145,10 @@ class DataView(BaseGroup):
 
   # --- create label at given location   -------------------------------------
 
-  def _create_label(self,row,col,justify):
+  def _create_label(self,row,col):
     """ create text at given location """
 
+    justify = self._justify[col+row*self._cols]
     if justify == Justify.LEFT:
       # start of cell plus padding
       x = self._x_cells[col] + self.padding
@@ -195,7 +201,7 @@ class DataView(BaseGroup):
 
     if self._labels:
       # remove old labels
-      for _ in len(self._labels):
+      for _ in range(len(self._labels)):
         self._labels.pop(0)
       gc.collect()
     else:
@@ -204,7 +210,7 @@ class DataView(BaseGroup):
 
     for row in range(self._rows):
       for col in range(self._cols):
-        lbl = self._create_label(row,col,self._justify)
+        lbl = self._create_label(row,col)
         self._labels.append(lbl)
 
   # --- set foreground-color   -----------------------------------------------
@@ -265,16 +271,28 @@ class DataView(BaseGroup):
   def justify(self,justify,index=None):
     """ set justification within cell """
 
+    if not self._w_cell:    # dynamic cell-width, just save justify
+      if index is None:
+        if isinstance(justify,int):
+          self._justify = [justify for i in range(self._dim[0]*self._dim[1])]
+        else:
+          self._justify  = justify
+      else:
+        self._justify[index] = justify
+      return
+
     if index is None:
       # justify all labels
-      self._justify = justify
-      for row in range(self._rows):
-        for col in range(self._cols):
-          lbl = self._create_label(row,col,self._justify)
-          self._labels[col+row*self._cols] = lbl
+      if isinstance(justify,int):
+        self._justify = [justify for i in range(self._dim[0]*self._dim[1])]
+      else:
+        self._justify  = justify
+      self._create_labels()
     else:
+      # justify a specific label
+      self._justify[index] = justify
       row,col = divmod(index,self._cols)
-      self._labels[index] = self._create_label(row,col,justify)
+      self._labels[index] = self._create_label(row,col)
 
     # remove unused labels
     gc.collect()
