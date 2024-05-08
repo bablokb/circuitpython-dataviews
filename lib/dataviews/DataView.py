@@ -158,12 +158,13 @@ class DataView(BaseGroup):
       line = Line(x_col,y0,x_col,y1,color=self.color)
       self._lines.append(line)
 
-  # --- create label at given location   -------------------------------------
+  # --- set position of label   ----------------------------------------------
 
-  def _create_label(self,row,col):
-    """ create text at given location """
+  def _set_position(self,lbl,row,col):
+    """ set label-position for given cell """
 
     justify = self._justify[col+row*self._cols]
+
     if justify == Justify.LEFT:
       # start of cell plus padding
       x = self._cell_x[col] + self.padding
@@ -177,11 +178,19 @@ class DataView(BaseGroup):
     x_anchor = 0.5*justify
     y        = (2*row+1)*self._cell_h/2
 
-    t = label.Label(self._font,text=self._text(col+row*self._cols),
-                    color=self.color,
-                    anchor_point=(x_anchor,self._y_anchor),
-                    anchored_position=(x,y))
-    return t
+    lbl.anchor_point=(x_anchor,self._y_anchor)
+    lbl.anchored_position=(x,y)
+
+  # --- create label for given cell   ----------------------------------------
+
+  def _create_label(self,row,col):
+    """ create label for given cell """
+
+    lbl = label.Label(self._font,text=self._text(col+row*self._cols),
+                    color=self.color)
+    if not self._auto_width:                 # static column width
+      self._set_position(lbl,row,col)
+    return lbl
 
   # --- get text for value by index   ----------------------------------------
 
@@ -227,6 +236,16 @@ class DataView(BaseGroup):
       for col in range(self._cols):
         lbl = self._create_label(row,col)
         self._labels.append(lbl)
+
+  # --- set positions   ------------------------------------------------------
+
+  def _set_positions(self):
+    """ set positions of all labels """
+
+    for row in range(self._rows):
+      for col in range(self._cols):
+        lbl = self._labels[col+row*self._cols]
+        self._set_position(lbl,row,col)
 
   # --- set foreground-color   -----------------------------------------------
 
@@ -286,31 +305,18 @@ class DataView(BaseGroup):
   def justify(self,justify,index=None):
     """ set justification within cell """
 
-    if self._auto_width:
-      if index is None:
-        if isinstance(justify,int):
-          self._justify = [justify]*(self._dim[0]*self._dim[1])
-        else:
-          self._justify  = justify
-      else:
-        self._justify[index] = justify
-      return
-
     if index is None:
       # justify all labels
       if isinstance(justify,int):
         self._justify = [justify]*(self._dim[0]*self._dim[1])
       else:
         self._justify  = justify
-      self._create_labels()
+      self._set_positions()
     else:
       # justify a specific label
       self._justify[index] = justify
       row,col = divmod(index,self._cols)
-      self._labels[index] = self._create_label(row,col)
-
-    # remove unused labels
-    gc.collect()
+      self._set_position(self._labels[index],row,col)
 
   # --- set formats   --------------------------------------------------------
 
