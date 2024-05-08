@@ -73,33 +73,41 @@ class DataView(BaseGroup):
     self._rows     = self._dim[0]
     self._cols     = self._dim[1]
 
-    # calculate column-width and column-start lists
-    self._weight_cells = None
+    # calculate width and weight for given col_width parameter
+    self._cell_wt = None
     if col_width is None:
-      self._width_cells = [int(self.width/self._cols)]*self._cols
+      # default is same width
+      self._cell_w = [int(self.width/self._cols)]*self._cols
+      self._auto_width = False
     elif not isinstance(col_width,str):
+      # assume list of width or weight
       if col_width[0] < 1:
-        self._width_cells = 'AUTO'
-        self._weight_cells = col_width
+        # list of weights, i.e. automatic size
+        self._auto_width = True
+        self._cell_wt = col_width
       else:
-        self._width_cells = col_width
+        # list of width, fixed size
+        self._auto_width = False
+        self._cell_w = col_width
     else:
-      self._width_cells = 'AUTO'
-      self._weight_cells = [1/self._cols]*self_cols
+      # assume string 'AUTO' or whatever, fixed weights
+      self._auto_width = True
+      self._cell_wt = [1/self._cols]*self_cols
 
-    self._h_cell   = self.height/self._rows
+    self._cell_h   = self.height/self._rows
     self._y_anchor = 0.5
 
     # calculate x-coordinates of column start:
     # a column starts on the next pixel right from the border/divider
-    if self._width_cells != 'AUTO':
-      self._x_cells = [border]
-      for w in self._width_cells[:-1]:
+    if not self._auto_width:
+      self._cell_x = [border]
+      for w in self._cell_w[:-1]:
         # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
-        self._x_cells.append(min(self._x_cells[-1]-1+w+1+1,self.width-1))
+        self._cell_x.append(min(self._cell_x[-1]-1+w+1+1,self.width-1))
 
-    self.set_background(bg_color)            # create UI-elements
-    if self._width_cells != 'AUTO':          # static column width
+    # create UI-elements
+    self.set_background(bg_color)
+    if not self._auto_width:                 # static column width
       self._create_lines()
       self._create_labels()
 
@@ -120,8 +128,8 @@ class DataView(BaseGroup):
     if self.border and self._divider:
       # all lines
       rows = range(0,self._rows+1)
-      x_cols = [x_cell-1 for x_cell in self._x_cells]
-      x_cols.append(min(x_cols[-1]+self._width_cells[-1]+1,self.width-1))
+      x_cols = [x_cell-1 for x_cell in self._cell_x]
+      x_cols.append(min(x_cols[-1]+self._cell_w[-1]+1,self.width-1))
     elif self.border and not self._divider:
       # only outer lines
       rows = [0,self._rows+1]
@@ -129,7 +137,7 @@ class DataView(BaseGroup):
     elif self._divider:
       # only inner lines
       rows = range(1,self._rows)
-      x_cols = [x_cell-1 for x_cell in self._x_cells[1:]]
+      x_cols = [x_cell-1 for x_cell in self._cell_x[1:]]
     else:
       # no lines at all
       return
@@ -158,16 +166,16 @@ class DataView(BaseGroup):
     justify = self._justify[col+row*self._cols]
     if justify == Justify.LEFT:
       # start of cell plus padding
-      x = self._x_cells[col] + self.padding
+      x = self._cell_x[col] + self.padding
     elif justify == Justify.RIGHT:
       # start of cell + cell-width minus padding
-      x = min(self._x_cells[col] + self._width_cells[col],self.width-1) - self.padding
+      x = min(self._cell_x[col] + self._cell_w[col],self.width-1) - self.padding
     else:
       # start of cell + 0.5*cell-width
-      x = self._x_cells[col] + self._width_cells[col]/2
+      x = self._cell_x[col] + self._cell_w[col]/2
 
     x_anchor = 0.5*justify
-    y        = (2*row+1)*self._h_cell/2
+    y        = (2*row+1)*self._cell_h/2
 
     t = label.Label(self._font,text=self._text(col+row*self._cols),
                     color=self.color,
@@ -278,7 +286,7 @@ class DataView(BaseGroup):
   def justify(self,justify,index=None):
     """ set justification within cell """
 
-    if self._width_cells == 'AUTO':
+    if self._auto_width:
       if index is None:
         if isinstance(justify,int):
           self._justify = [justify]*(self._dim[0]*self._dim[1])
@@ -317,7 +325,7 @@ class DataView(BaseGroup):
     self._values = values
 
     # static column width
-    if self._width_cells != 'AUTO':
+    if not self._auto_width:
       for i in range(len(values)):
         self._labels[i].text = self._text(i)
         self._labels[i].color = self._value2color(i)
