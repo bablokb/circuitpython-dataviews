@@ -97,19 +97,21 @@ class DataView(BaseGroup):
     self._cell_h   = self.height/self._rows
     self._y_anchor = 0.5
 
-    # calculate x-coordinates of column start:
-    # a column starts on the next pixel right from the border/divider
-    if not self._auto_width:
-      self._cell_x = [border]
-      for w in self._cell_w[:-1]:
-        # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
-        self._cell_x.append(min(self._cell_x[-1]-1+w+1+1,self.width-1))
-
     # create UI-elements
     self.set_background(bg_color)
-    if not self._auto_width:                 # static column width
-      self._create_lines()
-      self._create_labels()
+    self._create_labels()
+    self._create_lines()
+
+  # --- calculate x-coordinates of column-start   ----------------------------
+
+  def _calc_x_start(self):
+    """ calculate column x-start """
+
+    # a column starts on the next pixel right from the border/divider
+    self._cell_x = [self.border]
+    for w in self._cell_w[:-1]:
+      # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
+      self._cell_x.append(min(self._cell_x[-1]-1+w+1+1,self.width-1))
 
   # --- create border and dividers   -----------------------------------------
 
@@ -128,7 +130,7 @@ class DataView(BaseGroup):
     if self.border and self._divider:
       # all lines
       rows = range(0,self._rows+1)
-      x_cols = [x_cell-1 for x_cell in self._cell_x]
+      x_cols = [cell_x-1 for cell_x in self._cell_x]
       x_cols.append(min(x_cols[-1]+self._cell_w[-1]+1,self.width-1))
     elif self.border and not self._divider:
       # only outer lines
@@ -137,7 +139,7 @@ class DataView(BaseGroup):
     elif self._divider:
       # only inner lines
       rows = range(1,self._rows)
-      x_cols = [x_cell-1 for x_cell in self._cell_x[1:]]
+      x_cols = [cell_x-1 for cell_x in self._cell_x[1:]]
     else:
       # no lines at all
       return
@@ -186,21 +188,30 @@ class DataView(BaseGroup):
   def _create_label(self,row,col):
     """ create label for given cell """
 
-    lbl = label.Label(self._font,text=self._text(col+row*self._cols),
+    lbl = label.Label(self._font,text=self._get_text(col+row*self._cols),
                     color=self.color)
-    if not self._auto_width:                 # static column width
-      self._set_position(lbl,row,col)
     return lbl
 
   # --- get text for value by index   ----------------------------------------
 
-  def _text(self,index):
+  def _get_text(self,index):
     """ get formatted text by index """
 
     if self._values is None or self._values[index] is None:
       return self._formats[index]
     else:
       return self._formats[index].format(self._values[index])
+
+  # --- update text by index   -----------------------------------------------
+
+  def _update_text(self,index):
+    """ update text by index """
+
+    lbl = self._labels[index]
+    lbl.text = self._get_text(index)
+    if self._auto_width:
+      # update col-width if necessary
+      pass
 
   # --- set color from color_range and value   -------------------------------
 
@@ -232,10 +243,19 @@ class DataView(BaseGroup):
       self._labels = displayio.Group()
       self.append(self._labels)
 
+    # create labels and calculate max column widths
+    cell_w = [0]*self._cols
     for row in range(self._rows):
       for col in range(self._cols):
         lbl = self._create_label(row,col)
+        cell_w[col] = max(cell_w[col],lbl.width)
         self._labels.append(lbl)
+
+    # adjust column widths (TODO)
+    if self._auto_width:
+      self._cell_w = cell_w
+    self._calc_x_start()
+    self._set_positions()
 
   # --- set positions   ------------------------------------------------------
 
@@ -333,10 +353,10 @@ class DataView(BaseGroup):
     # static column width
     if not self._auto_width:
       for i in range(len(values)):
-        self._labels[i].text = self._text(i)
+        self._labels[i].text = self._get_text(i)
         self._labels[i].color = self._value2color(i)
 
     # dynamic column width
     else:
-      self._create_lines()
       self._create_labels()
+      self._create_lines()
