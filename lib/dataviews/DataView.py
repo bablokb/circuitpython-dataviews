@@ -62,8 +62,13 @@ class DataView(BaseGroup):
     else:
       self._justify  = justify
 
-    self._formats  = (formats if formats is not None
-                      else ['{0}']*(dim[0]*dim[1]))
+    if formats is None:
+      formats = '{0}'
+    if isinstance(formats,str):
+      self._formats = [formats]*(dim[0]*dim[1])
+    else:
+      self._formats  = formats
+
     self._values   = None
     self._color_r  = {}
     self._lines    = None
@@ -92,7 +97,7 @@ class DataView(BaseGroup):
     else:
       # assume string 'AUTO' or whatever, fixed weights
       self._auto_width = True
-      self._cell_wt = [1/self._cols]*self_cols
+      self._cell_wt = [1/self._cols]*self._cols
 
     self._cell_h   = self.height/self._rows
     self._y_anchor = 0.5
@@ -110,7 +115,7 @@ class DataView(BaseGroup):
     cell_w = [0]*self._cols
     for row in range(self._rows):
       for col in range(self._cols):
-        lbl = self._label[col+row*self._cols]
+        lbl = self._labels[col+row*self._cols]
         cell_w[col] = max(cell_w[col],lbl.width)
 
     # adjust column widths
@@ -121,7 +126,7 @@ class DataView(BaseGroup):
 
   # --- calculate x-coordinates of column-start   ----------------------------
 
-  def _calc_x_start(self):
+  def _calc_cell_x(self):
     """ calculate column x-start """
 
     # a column starts on the next pixel right from the border/divider
@@ -243,7 +248,7 @@ class DataView(BaseGroup):
 
     if self._auto_width:
       self._calc_cell_w()
-    self._calc_x_start()
+    self._calc_cell_x()
     self._set_positions()
 
   # --- set positions   ------------------------------------------------------
