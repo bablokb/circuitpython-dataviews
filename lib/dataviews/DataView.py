@@ -309,6 +309,12 @@ class DataView(BaseGroup):
       font = bitmap_font.load_font(fontname)
       self._labels[index].font = font
 
+    if self._auto_width:
+      self._calc_cell_w()
+      self._calc_cell_x()
+      self._set_positions()
+      self._create_lines()
+
   # --- set justification of values    ---------------------------------------
 
   def justify(self,justify,index=None):
