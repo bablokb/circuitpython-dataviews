@@ -335,19 +335,31 @@ class DataView(BaseGroup):
 
   # --- set formats   --------------------------------------------------------
 
-  def set_formats(self,formats):
+  def set_format(self,format,index=None):
     """ set formats. One format string for every data-item """
-    self._formats = formats
+    if index is None:
+      self._formats = format
+      self.set_values(None)
+    else:
+      seif._formats[index] = format
+      self._labels[index].text  = self._get_text(index)
+      self.set_values(None,index=index)
 
   # --- set values    --------------------------------------------------------
 
-  def set_values(self,values):
-    """ set values """
-    self._values = values
+  def set_values(self,values,index=None):
+    """ set values (passing None will force recalculation) """
+    if index is None:
+      if values:
+        self._values = values
+      for i in range(len(self._values)):
+        self._labels[i].text  = self._get_text(i)
+        self._labels[i].color = self._value2color(i)
+    else:
+      self._values[index] = values
+      self._labels[index].text  = self._get_text(index)
+      self._labels[index].color = self._value2color(index)
 
-    for i in range(len(values)):
-      self._labels[i].text  = self._get_text(index)
-      self._labels[i].color = self._value2color(i)
 
     if self._auto_width:
       self._calc_cell_w()
