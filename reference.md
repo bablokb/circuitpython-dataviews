@@ -32,7 +32,7 @@ This is a subclass of `displayio.Group` and can be used like any other
 group, but you will typically use it as the root-group, i.e.
 
     view = DataView(...)
-    display.show(view)
+    display.root_group = view
 
 A DataView is a grid of rows x cols fields. The number of rows and
 colums that fit on a display varies with display-size. Although it is
@@ -50,9 +50,10 @@ can be changed dynamically.
   - Fixed attributes
     * `dim = (rows,cols)`: dimension
     * `width`: width of the view in pixels
+    * `col_width=None`: column width (see below)
     * `height`: height of the view in pixels
     * `border`: border-size in pixels
-    * `divider`: divider-size in pixels (lines betweeen fields)
+    * `divider`: add divider between row and columns (True|False)
     * `padding`: added space between content and border and dividers
     * `x=0`    : x-origin within parent group
     * `y=0`    : y-origin within parent group
@@ -62,7 +63,8 @@ can be changed dynamically.
     * `color = Color.WHITE`: color of lines and values
     * `fontname = None`: name of the font to load. If unset, uses 
        `terminalio.Font`, a very small font
-    * `justify=Justify.RIGHT`: justification of all fields
+    * `justify=Justify.RIGHT`: justification of all fields. Can also be
+      a list with rows x cols elements
     * `formats=None`: formats of fields. Must be a list with rows x cols elements.
 
   - Methods:
@@ -79,10 +81,28 @@ can be changed dynamically.
       field with the given index.
     * `justify(self,justify,index=None)`: set global justification or
       justification of the field with the given index.
-    * `set_formats(self,formats)`: set list of formats. Must be a list with
-      rows x cols elements.
-    * `set_values(self,values)`: set values of fields. Must be a list with
-       rows x cols elements.
+    * `set_format(self,format,index=None)`: set list of formats.
+       Must be a list with rows x cols elements if index is not set.
+    * `set_values(self,values,index=None)`: set values of fields.
+       Must be a list with rows x cols elements if index is not set.
+
+The attribute `col_width` allows control over the column-width. Possible
+values:
+
+  - `None`: the default, this will generate equally sized columns
+  - `[width1,width2,...]`: use columns of the given sizes in pixels
+  - `'AUTO'`: optimize column-width so that the content will fit
+  - `[weight1,weight2,...]`: same as `'AUTO'`, but distribute remaining space
+    according to the given weights. Weights must be between 0 and 1.
+
+The first two options might clip their content. If the sum of the width
+given in the second option is smaller than the width of the DataView, you
+will have an empty additional column on the right.
+
+Automatically sized columns are clipped on the right if the total
+of the column widths is larger than the given view width (as defined by
+the `width`-attribute). Passing weights will not change this. Weights are
+only used to distribute unused space.
 
 
 Class DataPanel
