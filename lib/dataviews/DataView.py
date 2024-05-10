@@ -116,7 +116,7 @@ class DataView(BaseGroup):
     for row in range(self._rows):
       for col in range(self._cols):
         lbl = self._labels[col+row*self._cols]
-        cell_w[col] = max(cell_w[col],lbl.width)
+        cell_w[col] = max(cell_w[col],lbl.width+2*self.padding)
 
     # adjust column widths
     rest_w = self.width - sum(cell_w)
