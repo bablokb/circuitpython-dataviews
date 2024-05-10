@@ -32,9 +32,11 @@ _formats = ['Bat:', '{0:0.1f}V',
 dim = (3,4)
 
 width = 280
-col_width = [int(width/4) for _ in range(4)]
-col_width = [50,90,50,90]
-col_width = None
+#col_width = [int(width/4) for _ in range(4)]
+#col_width = [50,90,35,90]
+#col_width = None
+#col_width = 'AUTO'
+col_width = [0,0.5,0,0.5]
 
 _formats.extend(
   ["" for _ in range(dim[0]*dim[1] - len(_formats))])
@@ -46,6 +48,7 @@ _view = DataView(
   formats=_formats,
   border=1,
   divider=1,
+  padding=1,
   color=Color.BLACK,
   bg_color=Color.WHITE
   )
