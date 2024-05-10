@@ -33,6 +33,7 @@ else:
 view = DataView(
   dim=(3,2),
   width=display.width,height=display.height,
+  col_width=[0.3,0.7],
   justify=Justify.CENTER,
   color=Color.GREEN,
   fontname="fonts/DejaVuSansMono-Bold-24-subset.bdf",
@@ -41,7 +42,7 @@ view = DataView(
            "max:","{0:.1f}mV"],
   border=1,
   divider=1,
-  padding=10,
+  padding=5,
 )
 
 # show without values
