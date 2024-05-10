@@ -53,7 +53,7 @@ class DataView(BaseGroup):
                      x=x,y=y)
 
     self._dim      = dim
-    self._divider  = int(divider)
+    self._divider  = divider
     self._font     = (terminalio.FONT if fontname is None else
                       bitmap_font.load_font(fontname))
 
@@ -132,8 +132,8 @@ class DataView(BaseGroup):
     # a column starts on the next pixel right from the border/divider
     self._cell_x = [self.border]
     for w in self._cell_w[:-1]:
-      # last column-pos-1 + column-width + divider + 1 (next colum)
-      self._cell_x.append(min(self._cell_x[-1]-1+w+self._divider+1,self.width-1))
+      # last column-pos-1 + column-width + 1 (divider) + 1 (next colum)
+      self._cell_x.append(min(self._cell_x[-1]-1+w+1+1,self.width-1))
 
   # --- create border and dividers   -----------------------------------------
 
