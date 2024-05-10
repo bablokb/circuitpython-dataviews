@@ -1,5 +1,5 @@
-Dataviews - Simple Views for Data-Display
-=========================================
+Dataviews - Simple Views for Data
+=================================
 
 This project provides the CircuitPython module `dataviews` with a number
 of classes that simplify the presentation of data.
