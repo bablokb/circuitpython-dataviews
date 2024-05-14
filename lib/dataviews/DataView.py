@@ -39,6 +39,7 @@ class DataView(BaseGroup):
                fontname=None,               # font (defaults to terminalio.FONT
                justify=Justify.RIGHT,          # justification of labels
                formats=None,                # format of labels
+               value2color=None,            # callback for color
                x=0,                         # for displayio.Group
                y=0                          # for displayio.Group
                ):
@@ -69,6 +70,9 @@ class DataView(BaseGroup):
     else:
       self._formats  = formats
 
+    if value2color:
+      self._value2color = value2color    # replace internal default
+      
     self._values   = None
     self._color_r  = {}
     self._lines    = None
@@ -217,7 +221,7 @@ class DataView(BaseGroup):
 
   # --- set color from color_range and value   -------------------------------
 
-  def _value2color(self,index):
+  def _value2color(self,index,value):
     """ get color for given value """
 
     if not index in self._color_r:
@@ -228,7 +232,7 @@ class DataView(BaseGroup):
     for color,val in self._color_r[index]:
       if val is None or self._values is None:
         return color
-      elif self._values[index] <= val:
+      elif value <= val:
         return color
 
   # --- create labels   ------------------------------------------------------
@@ -287,7 +291,8 @@ class DataView(BaseGroup):
       self._labels[index].color = color
     else:
       self._color_r[index] = color_range
-      self._labels[index].color = self._value2color(index)
+      self._labels[index].color = self._value2color(index,
+                                                    self._values[index])
 
   # --- invert view   --------------------------------------------------------
 
@@ -359,11 +364,11 @@ class DataView(BaseGroup):
         self._values = values
       for i in range(len(self._values)):
         self._labels[i].text  = self._get_text(i)
-        self._labels[i].color = self._value2color(i)
+        self._labels[i].color = self._value2color(i,self._values[i])
     else:
       self._values[index] = values
       self._labels[index].text  = self._get_text(index)
-      self._labels[index].color = self._value2color(index)
+      self._labels[index].color = self._value2color(index,values)
 
 
     if self._auto_width:

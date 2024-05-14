@@ -55,6 +55,9 @@ can be changed dynamically.
     * `border`: border-size in pixels
     * `divider`: add divider between row and columns (True|False)
     * `padding`: added space between content and border and dividers
+    * `value2color=None`: callback to dynamically set the color of
+      a cell. Signature is `func(index,value)`. If `None`, use the colors
+      as defined by `set_color()` or `color`. 
     * `x=0`    : x-origin within parent group
     * `y=0`    : y-origin within parent group
 
