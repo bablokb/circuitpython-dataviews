@@ -226,7 +226,7 @@ class DataView(BaseGroup):
 
     # search for given color
     for color,val in self._color_r[index]:
-      if val is None:
+      if val is None or self._values is None:
         return color
       elif self._values[index] <= val:
         return color
