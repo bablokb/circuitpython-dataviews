@@ -291,8 +291,9 @@ class DataView(BaseGroup):
       self._labels[index].color = color
     else:
       self._color_r[index] = color_range
-      self._labels[index].color = self._value2color(index,
-                                                    self._values[index])
+      value = self._values[index] if self._values else None
+      self._labels[index].color = self._value2color(index,value)
+               
 
   # --- invert view   --------------------------------------------------------
 
