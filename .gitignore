@@ -6,6 +6,7 @@ doc.local
 test
 lib/adafruit*
 lib/InkyPack.py
+lib/phat.py
 *secrets.py
 *configuration.py
 boot_out.txt
