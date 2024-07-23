@@ -127,6 +127,25 @@ class DisplayFactory:
     )
     return InkyPack.InkyPack(display_bus,busy_pin=board.GP26)
 
+  # --- create display for Pimoronis Inky-pHat   -----------------------------
+
+  @staticmethod
+  def inky_phat(spi=None,pin_dc=board.GPIO22,pin_cs=board.CE0,
+                    pin_rst=board.GPIO27,pin_busy=board.GPIO17):
+    """ create display for InkyPack """
+
+    import phat
+
+    if spi is None:
+      spi = busio.SPI(board.SCLK,MOSI=board.MOSI)
+
+    display_bus = displayio.FourWire(
+      spi, command=pin_dc, chip_select=pin_cs,
+      reset=pin_rst, baudrate=1000000
+    )
+    return phat.Inky_pHat(display_bus,busy_pin=pin_busy,rotation=90,
+                          border_color='white')
+
   # --- create display for Adafruits Monochrom 2.13" e-ink   ------------------
 
   @staticmethod
@@ -220,10 +239,16 @@ class DisplayFactory:
                                          width=width,height=height,
                                          refresh_time=2,
                                          seconds_per_frame=40)
-    else: # assume Inky-wHat
+    elif width == 400: # assume Inky-wHat
       import what
       display = what.Inky_wHat(display_bus,busy_pin=pin_busy,
                                color=color,border_color='white',
                                black_bits_inverted=False)
+
+    elif width == 250: # assume Inky-pHat
+      import phat
+      display = phat.Inky_pHat(display_bus,busy_pin=pin_busy,rotation=90,
+                               border_color='white')
+
     display.auto_refresh = False
     return display
