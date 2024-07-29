@@ -130,14 +130,19 @@ class DisplayFactory:
   # --- create display for Pimoronis Inky-pHat   -----------------------------
 
   @staticmethod
-  def inky_phat(spi=None,pin_dc=board.GPIO22,pin_cs=board.CE0,
-                    pin_rst=board.GPIO27,pin_busy=board.GPIO17):
+  def inky_phat(spi=None,pin_dc=None,pin_cs=None,
+                    pin_rst=None,pin_busy=None):
     """ create display for InkyPack """
 
     import phat
 
     if spi is None:
       spi = busio.SPI(board.SCLK,MOSI=board.MOSI)
+    if pin_dc is None and hasattr(board,"GPIO22"):    # this is with
+      pin_dc   = board.GPIO22                         # pico-*-base boards
+      pin_cs   = board.CE0
+      pin_rst  = board.GPIO27
+      pin_busy = board.GPIO17
 
     display_bus = displayio.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
