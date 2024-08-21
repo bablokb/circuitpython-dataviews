@@ -13,6 +13,13 @@
 import board
 import busio
 import displayio
+import sys
+if sys.version_info[0] > 8:
+  import fourwire
+  from i2cdisplaybus import I2CDisplayBus
+else:
+  fourwire = displayio
+  I2CDisplayBus = displayio.I2CDisplay
 
 # --- helper-function for Inky-displays   -------------------------------------
 
@@ -54,14 +61,14 @@ class DisplayFactory:
       if scl is None:
         scl = board.SCL
       i2c = busio.I2C(sda=sda,scl=scl,frequency=400000)
-    display_bus = displayio.I2CDisplay(i2c, device_address=addr)
+    display_bus = I2CDisplayBus(i2c, device_address=addr)
     return SSD1306(display_bus,width=width,height=height)
 
   # --- create ST7789-based SPI-display   ------------------------------------
 
   @staticmethod
   def st7789(pin_dc,pin_cs,spi=None,pin_rst=None,
-             height=135,width=240,rotation=270,rowstart=40,colstart=53):
+             height=135,width=240,rotation=270,rowstart=40,colstart=53,**kwargs):
     """ factory-method for ST7789-based SPI-displays """
 
     from adafruit_st7789 import ST7789
@@ -69,10 +76,10 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    bus = displayio.FourWire(spi,command=pin_dc,chip_select=pin_cs,
+    bus = fourwire.FourWire(spi,command=pin_dc,chip_select=pin_cs,
                              reset=pin_rst)
     return ST7789(bus,width=width,height=height,rotation=rotation,
-                  rowstart=rowstart,colstart=colstart)
+                  rowstart=rowstart,colstart=colstart,**kwargs)
 
   # --- cerate ST7789-based display for the Pimoroni Pico-Display-Pack  ------
 
@@ -88,7 +95,7 @@ class DisplayFactory:
 
   @staticmethod
   def st7735(pin_dc,pin_cs,spi=None,pin_rst=None,
-             height=128,width=160,rotation=90,bgr=True):
+             height=128,width=160,rotation=90,bgr=True,**kwargs):
     """ factory-method for ST7735-based SPI-displays """
 
     from adafruit_st7735r import ST7735R       # SPI-TFT  display
@@ -96,10 +103,10 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    bus = displayio.FourWire(spi,command=pin_dc,chip_select=pin_cs,
+    bus = fourwire.FourWire(spi,command=pin_dc,chip_select=pin_cs,
                              reset=pin_rst)
     return ST7735R(bus,width=width,height=height,
-                   rotation=rotation,bgr=bgr)
+                   rotation=rotation,bgr=bgr,**kwargs)
 
   # --- create pygame-based display   ----------------------------------------
 
@@ -121,7 +128,7 @@ class DisplayFactory:
     if spi is None:
       spi = busio.SPI(board.GP18,MOSI=board.GP19)
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=board.GP20, chip_select=board.GP17,
       reset=board.GP21, baudrate=1000000
     )
@@ -144,7 +151,7 @@ class DisplayFactory:
       pin_rst  = board.GPIO27
       pin_busy = board.GPIO17
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
       reset=pin_rst, baudrate=1000000
     )
@@ -163,7 +170,7 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
       reset=pin_rst, baudrate=1000000
     )
@@ -185,7 +192,7 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
       reset=pin_rst, baudrate=1000000
     )
@@ -204,7 +211,7 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
       reset=pin_rst, baudrate=1000000
     )
@@ -233,7 +240,7 @@ class DisplayFactory:
     if spi is None:
       spi = board.SPI()
 
-    display_bus = displayio.FourWire(
+    display_bus = fourwire.FourWire(
       spi, command=pin_dc, chip_select=pin_cs,
       reset=pin_rst, baudrate=1000000
     )
