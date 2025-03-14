@@ -27,10 +27,18 @@ if not hasattr(board,'DISPLAY'):
 if hasattr(board,'DISPLAY'):
   display = board.DISPLAY
 else:
+  # Pimoroni Display-Pack
+  #display = DisplayFactory.display_pack()
+
+  # Adafruit 240x320
   display = DisplayFactory.st7789(
-    pin_dc=board.GP16,
-    pin_cs=board.GP17,
-    spi=busio.SPI(clock=board.GP18,MOSI=board.GP19)
+    spi=busio.SPI(clock=board.GP14,MOSI=board.GP15),
+    pin_dc=board.GP9,
+    pin_cs=board.GP13,
+    pin_rst=board.GP11,
+    width=320, height=240, rotation=270,
+    backlight_pin=board.GP10,
+    brightness=0.6,
   )
 
 # create view
@@ -49,7 +57,10 @@ view = DataView(
 )
 
 # show without values
-display.show(view)
+if hasattr(display,"root_group"):
+  display.root_group = view
+else:
+  display.show(view)
 time.sleep(3)
 
 # now set values

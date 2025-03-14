@@ -31,11 +31,7 @@ if not hasattr(board,'DISPLAY'):
 if hasattr(board,'DISPLAY'):
   display = board.DISPLAY
 else:
-  display = DisplayFactory.st7789(
-    pin_dc=board.GP16,
-    pin_cs=board.GP17,
-    spi=busio.SPI(clock=board.GP18,MOSI=board.GP19)
-  )
+  display = DisplayFactory.display_pack()
 
 # create sensor
 if hasattr(board,'I2C'):

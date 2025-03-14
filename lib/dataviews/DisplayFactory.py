@@ -67,8 +67,7 @@ class DisplayFactory:
   # --- create ST7789-based SPI-display   ------------------------------------
 
   @staticmethod
-  def st7789(pin_dc,pin_cs,spi=None,pin_rst=None,
-             height=135,width=240,rotation=270,rowstart=40,colstart=53,**kwargs):
+  def st7789(pin_dc,pin_cs,pin_rst=None,spi=None,**kwargs):
     """ factory-method for ST7789-based SPI-displays """
 
     from adafruit_st7789 import ST7789
@@ -78,10 +77,9 @@ class DisplayFactory:
 
     bus = fourwire.FourWire(spi,command=pin_dc,chip_select=pin_cs,
                              reset=pin_rst)
-    return ST7789(bus,width=width,height=height,rotation=rotation,
-                  rowstart=rowstart,colstart=colstart,**kwargs)
+    return ST7789(bus,**kwargs)
 
-  # --- cerate ST7789-based display for the Pimoroni Pico-Display-Pack  ------
+  # --- create ST7789-based display for the Pimoroni Pico-Display-Pack  ------
 
   @staticmethod
   def display_pack(spi=None):
@@ -89,7 +87,9 @@ class DisplayFactory:
 
     if spi is None:
       spi = busio.SPI(clock=board.GP18,MOSI=board.GP19)
-    return DisplayFactory.st7789(pin_dc=board.GP16,pin_cs=board.GP17,spi=spi)
+    return DisplayFactory.st7789(
+      spi=spi,pin_dc=board.GP16,pin_cs=board.GP17,
+      height=135,width=240,rotation=270,rowstart=40,colstart=53)
 
   # --- create ST7735-based SPI-display   ------------------------------------
 
