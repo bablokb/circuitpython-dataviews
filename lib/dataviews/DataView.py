@@ -107,7 +107,6 @@ class DataView(BaseGroup):
     self._y_anchor = 0.5
 
     # create UI-elements
-    self.set_background(bg_color)
     self._create_labels()
     self._create_lines()
 

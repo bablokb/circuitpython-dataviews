@@ -111,7 +111,6 @@ class DataPanel(BaseGroup):
       self._footer.color = color
 
     # create UI-elements
-    self.set_background(bg_color)
     self._create_labels()
     self._add_view()
 

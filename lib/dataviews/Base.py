@@ -81,6 +81,8 @@ class BaseGroup(displayio.Group):
     if not self.width and not self.height:
       return
 
+    if self.bg_color is None:
+      return
     shader = displayio.Palette(2)
     if bg_color != -1:
       shader[0] = bg_color
