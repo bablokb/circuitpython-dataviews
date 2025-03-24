@@ -14,7 +14,7 @@ import board
 import busio
 import displayio
 import sys
-if sys.version_info[0] > 8:
+if sys.implementation.version[0] > 8:
   import fourwire
   from i2cdisplaybus import I2CDisplayBus
 else:
