@@ -221,6 +221,27 @@ class DisplayFactory:
                                   highlight_color=0xFF0000,
                                   rotation=roation)
 
+  # --- create display for WeAct 2.9" e-Paper   -----------------------------
+
+  @staticmethod
+  def weact_2_9(pin_dc,pin_cs,spi=None,pin_rst=None,pin_busy=None,
+                    rotation=270,**kwargs):
+    """ create display for WeAct 2.9" e-paper display """
+
+    import adafruit_ssd1680
+
+    if spi is None:
+      spi = board.SPI()
+
+    display_bus = fourwire.FourWire(
+      spi, command=pin_dc, chip_select=pin_cs,
+      reset=pin_rst, baudrate=1000000
+    )
+
+    return adafruit_ssd1680.SSD1680(display_bus,width=296,height=128,
+                                    busy_pin=BUSY_PIN,
+                                    rotation=roation, **kwargs)
+
   # --- create display for Pimoroni Inky-displays   --------------------------
 
   @staticmethod
