@@ -115,7 +115,8 @@ class DisplayFactory:
     """ factory-method for pygame-based displays """
 
     from blinka_displayio_pygamedisplay import PyGameDisplay
-    return PyGameDisplay(width=width,height=height,**kwargs)
+    return PyGameDisplay(width=width,height=height,
+                         refresh_on_pygame_events=True,**kwargs)
 
   # --- create display for Pimoronis Pico Inky-Pack   -------------------------
 
@@ -239,8 +240,8 @@ class DisplayFactory:
     )
 
     return adafruit_ssd1680.SSD1680(display_bus,width=296,height=128,
-                                    busy_pin=BUSY_PIN,
-                                    rotation=roation, **kwargs)
+                                    busy_pin=pin_busy,
+                                    rotation=rotation, **kwargs)
 
   # --- create display for Pimoroni Inky-displays   --------------------------
 
