@@ -33,9 +33,9 @@ else:
   # Adafruit 240x320
   display = DisplayFactory.st7789(
     spi=busio.SPI(clock=board.GP14,MOSI=board.GP15),
-    pin_dc=board.GP9,
+    pin_dc=board.GP11,
     pin_cs=board.GP13,
-    pin_rst=board.GP11,
+    pin_rst=board.GP9,
     width=320, height=240, rotation=270,
     backlight_pin=board.GP10,
     brightness=0.6,
