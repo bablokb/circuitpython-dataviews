@@ -42,7 +42,7 @@ view = DataView(
 )
 
 # show without values
-display.show(view)
+display.root_group = view
 time.sleep(3)
 
 # now set values

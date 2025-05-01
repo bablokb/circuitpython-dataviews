@@ -65,7 +65,7 @@ panel = DataPanel(
   justify=Justify.CENTER,
   )
 
-display.show(panel)
+display.root_group = panel
 time.sleep(3)
 
 # update some title attributes

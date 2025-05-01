@@ -52,7 +52,7 @@ view = DataView(
   divider=0,
   padding=10,
 )
-display.show(view)
+display.root_group = view
 
 while True:
   view.set_values([sensor.temperature,sensor.relative_humidity])

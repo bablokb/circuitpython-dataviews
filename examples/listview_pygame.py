@@ -41,7 +41,7 @@ view = ListView(
   bg_color=Color.GREEN,
   border=1,
 )
-display.show(view)
+display.root_group = view
 
 item_factory = LabelItem(
   color=Color.BLUE,

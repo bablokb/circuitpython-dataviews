@@ -57,10 +57,7 @@ view = DataView(
 )
 
 # show without values
-if hasattr(display,"root_group"):
-  display.root_group = view
-else:
-  display.show(view)
+display.root_group = view
 time.sleep(3)
 
 # now set values

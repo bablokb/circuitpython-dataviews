@@ -55,7 +55,7 @@ values   = ["00:00"]
 
 start = time.monotonic()
 view.set_values(values)
-display.show(view)
+display.root_group = view
 
 while True:
   overhead = time.monotonic() - start

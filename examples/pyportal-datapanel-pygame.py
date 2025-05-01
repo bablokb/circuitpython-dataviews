@@ -62,7 +62,7 @@ panel = DataPanel(
   justify=Justify.CENTER,
   )
 
-display.show(panel)
+display.root_group = panel
 display.refresh()
 time.sleep(3)
 

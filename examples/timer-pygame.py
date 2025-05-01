@@ -47,7 +47,7 @@ timer    = 0
 values   = ["00:00"]
 
 view.set_values(values)
-display.show(view)
+display.root_group = view
 
 def on_time():
   global timer

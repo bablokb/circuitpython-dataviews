@@ -87,7 +87,7 @@ values.extend([None for _ in range(len(_formats)-len(values))])
 
 _view.set_values(values)
 print("starting show()")
-display.show(_panel)
+display.root_group = _panel
 print("starting refresh()")
 display.refresh()
 print("finished")
