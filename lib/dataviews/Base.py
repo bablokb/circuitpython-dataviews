@@ -64,13 +64,24 @@ class BaseGroup(displayio.Group):
     self.width     = width
     self.height    = height
     self.bg_color  = bg_color
-    self.color     = color
+    self._color    = color
     self.border    = border
     self.padding   = padding
 
     self._background = displayio.Group()
     self.append(self._background)
     self.set_background()
+
+  # --- color property (add setter allows override in subclasses)   ----------
+
+  @property
+  def color(self):
+    """ color property """
+    return self._color
+
+  @color.setter
+  def color(self,value):
+    self._color = value
 
   # --- set background   -----------------------------------------------------
 
