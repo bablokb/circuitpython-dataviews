@@ -20,17 +20,6 @@ from dataviews.DisplayFactory import DisplayFactory
 from dataviews.DataView  import DataView
 from dataviews.DataPanel import DataPanel, PanelText
 
-
-# color callback
-def value2color(index,value):
-  # print all labels in AQUA
-  if index in [0,2,4,6]:
-    return Color.AQUA
-  elif value is not None and value > 30:
-    return Color.RED
-  else:
-    return Color.BLACK
-
 # create display
 display = DisplayFactory.pygame(width=296,height=128,native_frames_per_second=1)
 display.auto_refresh=False
@@ -43,14 +32,15 @@ _formats = ['Bat:', '{0:0.1f}V',
 dim = (3,4)
 
 width = 280
-#col_width = [int(width/4) for _ in range(4)]
+col_width = [int(width/4) for _ in range(4)]
 #col_width = [50,90,35,90]
 #col_width = None
-#col_width = 'AUTO'
-col_width = [0,0.5,0,0.5]
+col_width = 'AUTO'
+#col_width = [0,0.5,0,0.5]      # same as 'AUTO', but distribute excess space
 
 _formats.extend(
   ["" for _ in range(dim[0]*dim[1] - len(_formats))])
+
 _view = DataView(
   dim=dim,
   width=width,height=int(0.6*display.height),
@@ -61,9 +51,15 @@ _view = DataView(
   divider=1,
   padding=1,
   color=Color.BLACK,
-  bg_color=Color.WHITE,
-  value2color=value2color
+  bg_color=Color.WHITE
   )
+
+# change color of headings to aqua
+for index in [0,2,4,6]:
+  _view.set_color(Color.AQUA,index)
+# dynamic color black/red for values
+for index in [1,3,5,7]:
+  _view.set_color([(Color.BLACK,30),(Color.RED,None)],index)
 
 for i in range(0,dim[0]*dim[1],2):
   _view.justify(Justify.LEFT,index=i)

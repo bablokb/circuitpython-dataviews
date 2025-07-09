@@ -87,7 +87,7 @@ for index in [0,2,4]:
 # set dynamic colors
 for index in [1,3,5]:
   view.set_color(index=index,
-                 color_range=[(Color.BLUE,15),
+                 color=[(Color.BLUE,15),
                               (Color.WHITE,24),(Color.RED,None)])
 time.sleep(3)
 

@@ -94,7 +94,7 @@ def test5():
   for index in [1,3,5]:
     print(f"set color for column {index}")
     view.set_color(index=index,
-                   color_range=[(Color.BLUE,15),
+                   color=[(Color.BLUE,15),
                                 (Color.WHITE,24),(Color.RED,None)])
   return 0
 tests.append(test5)
