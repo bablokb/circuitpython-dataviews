@@ -19,6 +19,7 @@ from adafruit_display_shapes.line import Line
 from adafruit_bitmap_font import bitmap_font
 
 from dataviews.Base import BaseGroup, Color, Justify
+from dataviews.DataLabel import DataLabel
 
 # --- base class for all data-views   ----------------------------------------
 
@@ -39,7 +40,7 @@ class DataView(BaseGroup):
                fontname=None,               # font (defaults to terminalio.FONT
                justify=Justify.RIGHT,          # justification of labels
                formats=None,                # format of labels
-               value2color=None,            # callback for color
+               objects=None,                # list (row,col,DataCell)
                x=0,                         # for displayio.Group
                y=0                          # for displayio.Group
                ):
@@ -55,7 +56,7 @@ class DataView(BaseGroup):
 
     self._dim      = dim
     self._divider  = divider
-    self._font     = (terminalio.FONT if fontname is None else
+    font           = (terminalio.FONT if fontname is None else
                       bitmap_font.load_font(fontname))
 
     if isinstance(justify,int):
@@ -66,17 +67,12 @@ class DataView(BaseGroup):
     if formats is None:
       formats = '{0}'
     if isinstance(formats,str):
-      self._formats = [formats]*(dim[0]*dim[1])
+      formats = [formats]*(dim[0]*dim[1])
     else:
-      self._formats  = formats
+      formats  = formats
 
-    if value2color:
-      self._value2color = value2color    # replace internal default
-      
-    self._values   = None
-    self._color_r  = {}
     self._lines    = None
-    self._labels   = None
+    self._cells   = None
 
     # some constant values that depend on dim and width/height
     self._rows     = self._dim[0]
@@ -107,7 +103,7 @@ class DataView(BaseGroup):
     self._y_anchor = 0.5
 
     # create UI-elements
-    self._create_labels()
+    self._create_cells(objects,font,formats)
     self._create_lines()
 
   # --- calculate cell-width   -----------------------------------------------
@@ -115,13 +111,14 @@ class DataView(BaseGroup):
   def _calc_cell_w(self):
     """ calculate cell width for dynamic column-width """
 
+    # calculate necessary width per column, iterating over all rows
     cell_w = [0]*self._cols
     for row in range(self._rows):
       for col in range(self._cols):
-        lbl = self._labels[col+row*self._cols]
-        cell_w[col] = max(cell_w[col],lbl.width+2*self.padding)
+        cell = self._cells[col+row*self._cols]
+        cell_w[col] = max(cell_w[col],cell.width+2*self.padding)
 
-    # adjust column widths
+    # adjust column widths (distribute rest according to weights)
     rest_w = self.width - sum(cell_w)
     if rest_w > 0:
       cell_w = [int(w+wt*rest_w) for (w,wt) in zip(cell_w,self._cell_wt)]
@@ -187,7 +184,7 @@ class DataView(BaseGroup):
 
   # --- set position of label   ----------------------------------------------
 
-  def _set_position(self,lbl,row,col):
+  def _set_position(self,cell,row,col):
     """ set label-position for given cell """
 
     justify = self._justify[col+row*self._cols]
@@ -204,95 +201,71 @@ class DataView(BaseGroup):
 
     x_anchor = 0.5*justify
     y        = (2*row+1)*self._cell_h/2
+    cell.set_position((x_anchor,self._y_anchor),(x,y))
 
-    lbl.anchor_point=(x_anchor,self._y_anchor)
-    lbl.anchored_position=(x,y)
+  # --- set positions   ------------------------------------------------------
 
-  # --- get text for value by index   ----------------------------------------
+  def _set_positions(self):
+    """ set positions of all cells """
 
-  def _get_text(self,index):
-    """ get formatted text by index """
-
-    if self._values is None or self._values[index] is None:
-      return self._formats[index]
-    else:
-      return self._formats[index].format(self._values[index])
-
-  # --- set color from color_range and value   -------------------------------
-
-  def _value2color(self,index,value):
-    """ get color for given value """
-
-    if not index in self._color_r:
-      # no range, so just return the current color
-      return self._labels[index].color
-
-    # search for given color
-    for color,val in self._color_r[index]:
-      if val is None or self._values is None:
-        return color
-      elif value <= val:
-        return color
-
-  # --- create labels   ------------------------------------------------------
-
-  def _create_labels(self):
-    """ create fields """
-
-    self._labels = displayio.Group()
-    self.append(self._labels)
-
-    # create labels
     for row in range(self._rows):
       for col in range(self._cols):
-        lbl = label.Label(self._font,text=self._get_text(col+row*self._cols),
-                          color=self.color)
-        self._labels.append(lbl)
+        cell = self._cells[col+row*self._cols]
+        self._set_position(cell,row,col)
+
+  # --- create cells   -------------------------------------------------------
+
+  def _create_cells(self,objects,font,formats):
+    """ create cells """
+
+    group = displayio.Group()
+    self.append(group)
+
+    self._cells = [None]*self._rows*self._cols
+    if objects:
+      for row,col,obj in objects:
+        self._cells[col+row*self._cols] = obj
+
+    # append cell-content to group
+    for row in range(self._rows):
+      for col in range(self._cols):
+        if not self._cells[col+row*self._cols]:
+          # create default cell objects (DataLabel)
+          self._cells[col+row*self._cols] = DataLabel(
+            font=font,
+            color=self.color,
+            bg_color=self.bg_color,
+            format=formats[col+row*self._cols])
+        group.append(self._cells[col+row*self._cols].content)
 
     if self._auto_width:
       self._calc_cell_w()
     self._calc_cell_x()
     self._set_positions()
 
-  # --- set positions   ------------------------------------------------------
-
-  def _set_positions(self):
-    """ set positions of all labels """
-
-    for row in range(self._rows):
-      for col in range(self._cols):
-        lbl = self._labels[col+row*self._cols]
-        self._set_position(lbl,row,col)
-
   # --- set foreground-color   -----------------------------------------------
 
-  def set_color(self,color=None,index=None,color_range=None):
-    """ set color.
-    If color_range = [(color1,value1),...] is supplied, the color argument
-    is ignored and the color depends on the value. Note that the
-    tuples within range have to be ordered by value. The last value can
-    be None.
-    """
+  def set_color(self,color=None,index=None):
+    """ set color. """
+
+    if color is None:
+      return
 
     if index is None:
-      if color is None:
-        return
       # set color for all labels and lines
-      self.color = color
-      for lbl in self._labels:
-        lbl.color = color
-      for line in self._lines:
-        line.color = color
-    elif color_range is None:
-      if color is None:
-        return
-      # set color for given label
-      self._labels[index].color = color
+      for cell in self._cells:
+        cell.set_color(color)
     else:
-      self._color_r[index] = color_range
-      value = self._values[index] if self._values else None
-      self._labels[index].color = self._value2color(index,value)
-               
+      # set color for given label
+      self._cells[index].set_color(color)
+
+  # --- color property of DataView   -----------------------------------------
+
+  @BaseGroup.color.setter
+  def color(self,value):
+    self._color = value
+    for line in self._lines:
+      line.color = value
 
   # --- invert view   --------------------------------------------------------
 
@@ -301,23 +274,24 @@ class DataView(BaseGroup):
     fg_new = self.bg_color
     bg_new = self.color
     self.set_background(bg_new)
-    self.set_color(fg_new)
+    self.color = fg_new
     self.bg_color = bg_new
+    for cell in self._cells:
+      cell.invert()
 
   # --- set font   -----------------------------------------------------------
 
   def set_font(self,fontname,index=None):
     """ set font """
 
+    font = bitmap_font.load_font(fontname)
     if index is None:
-      # set font for all labels
-      self._font = bitmap_font.load_font(fontname)
-      for lbl in self._labels:
-        lbl.font = self._font
+      # set font for all cells
+      for cell in self._cells:
+        cell.font = font
     else:
-      # set font for given label
-      font = bitmap_font.load_font(fontname)
-      self._labels[index].font = font
+      # set font for given cell
+      self._cells[index].font = font
 
     if self._auto_width:
       self._calc_cell_w()
@@ -341,35 +315,27 @@ class DataView(BaseGroup):
       # justify a specific label
       self._justify[index] = justify
       row,col = divmod(index,self._cols)
-      self._set_position(self._labels[index],row,col)
+      self._set_position(self._cells[index],row,col)
 
   # --- set formats   --------------------------------------------------------
 
   def set_format(self,format,index=None):
-    """ set formats. One format string for every data-item """
+    """ set formats. format without an index must be a list """
     if index is None:
-      self._formats = format
-      self.set_values(None)
+      for i in range(len(format)):
+        self._cells[i].set_format(format[i])
     else:
-      seif._formats[index] = format
-      self._labels[index].text  = self._get_text(index)
-      self.set_values(None,index=index)
+        self._cells[index].set_format(format)
 
   # --- set values    --------------------------------------------------------
 
   def set_values(self,values,index=None):
     """ set values (passing None will force recalculation) """
     if index is None:
-      if values:
-        self._values = values
-      for i in range(len(self._values)):
-        self._labels[i].text  = self._get_text(i)
-        self._labels[i].color = self._value2color(i,self._values[i])
+      for i in range(len(values)):
+        self._cells[i].set_value(values[i])
     else:
-      self._values[index] = values
-      self._labels[index].text  = self._get_text(index)
-      self._labels[index].color = self._value2color(index,values)
-
+      self._cells[index].set_value(values)
 
     if self._auto_width:
       self._calc_cell_w()
