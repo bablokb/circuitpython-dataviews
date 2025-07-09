@@ -55,9 +55,7 @@ can be changed dynamically.
     * `border`: border-size in pixels
     * `divider`: add divider between row and columns (True|False)
     * `padding`: added space between content and border and dividers
-    * `value2color=None`: callback to dynamically set the color of
-      a cell. Signature is `func(index,value)`. If `None`, use the colors
-      as defined by `set_color()` or `color`. 
+    * `objects`: list of (row,col,DataCell)-tuples (optional)
     * `x=0`    : x-origin within parent group
     * `y=0`    : y-origin within parent group
 
@@ -70,20 +68,21 @@ can be changed dynamically.
       a list with rows x cols elements
     * `formats=None`: formats of fields. Must be a list with rows x cols elements.
 
-  - Methods:
+  - Methods/Properties:
     * `set_background(self,bg_color)`: set background color.
-    * `set_color(self,color=None,index=None,color_range=None)`:  
-       set global foreground color or color of the field with the given index.
-       The index is mapped to fields in row-column order.  
+    * `color`: set color of the view, boarder and dividers (property)
+    * `set_color(self,color=None,index=None)`:  
+       set color/color-range of all cells or the cell with the given index.
+       The index is mapped to cells in row-column order.  
        You can also supply a color-range as a list `[(color,value),...]`,e.g.
        `[(Color.BLUE,0),(Color.GREEN,20),(Color.RED,None)]`. With
        this example values below zero will be in blue, below 20 in green and all
        values above will be in red color.
     * `invert(self)`: flip forground and background colors.
     * `set_font(self,fontname,index=None)`: set global font or font of the
-      field with the given index.
+      cell with the given index.
     * `justify(self,justify,index=None)`: set global justification or
-      justification of the field with the given index.
+      justification of the cell with the given index.
     * `set_format(self,format,index=None)`: set list of formats.
        Must be a list with rows x cols elements if index is not set.
     * `set_values(self,values,index=None)`: set values of fields.
@@ -106,6 +105,12 @@ Automatically sized columns are clipped on the right if the total
 of the column widths is larger than the given view width (as defined by
 the `width`-attribute). Passing weights will not change this. Weights are
 only used to distribute unused space.
+
+`objects` is a list of `(row,col,DataCell)`-tuples. `DataCell` is the
+base class and itself does not provide any content. To use this
+feature, you have to implement a sublcass of `DataCell`. The default
+class for cells is `DataLabel`. Objects of this type are created
+automatically for all cells without explicit cell-object.
 
 
 Class DataPanel
@@ -155,3 +160,18 @@ Class DisplayFactory
 
 This is a small utility class with static methods to create display-objects for
 some common small displays like I2C-OLED with SSD1306, ST7735, ST7789.
+
+
+Class DataCell
+--------------
+
+Base class of all cells within a view. Cannot be used directly.
+
+
+Class DataLabel
+---------------
+
+Default type of cells. Objects of this type are created automatically for
+every cell, except those cells with explicit object (as provided to the
+constructor of `DataView`).
+
